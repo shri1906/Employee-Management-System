@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 
 const User = require("../models/User");
 const connectDB = require("../config/db");
 
 const createAdmin = async () => {
   try {
+    // Connect to DB
     await connectDB();
 
-    const email = "admin@gmail.com";
+    const email = "shivammaurya7310@gmail.com";
 
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email });
@@ -21,13 +22,18 @@ const createAdmin = async () => {
     // Hash password
     const hashedPassword = bcrypt.hashSync("Admin@123", 10);
 
-    // Create admin user
+    // Create admin user (MATCHING SCHEMA)
     const admin = await User.create({
       name: "System Admin",
       email,
       password: hashedPassword,
       role: "admin",
-      designation: "Administrator"
+      designation: "Administrator",
+      phone: "7310941087",
+      isActive: true,
+      department: null,               // admin may not belong to a department
+      resetPasswordToken: undefined,
+      resetPasswordExpire: undefined
     });
 
     console.log("✅ Admin user created successfully");
