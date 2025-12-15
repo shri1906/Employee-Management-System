@@ -1,6 +1,12 @@
 const router = require("express").Router();
-const { login } = require("../controllers/authController");
+const auth = require("../middleware/authMiddleware");
+const ctrl = require("../controllers/authController");
 
-router.post("/login", login);
+router.post("/login", ctrl.login);
+
+// 🔐 Password APIs
+router.post("/change-password", auth, ctrl.changePassword);
+router.post("/forgot-password", ctrl.forgotPassword);
+router.post("/reset-password/:token", ctrl.resetPassword);
 
 module.exports = router;
