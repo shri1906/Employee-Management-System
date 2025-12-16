@@ -78,5 +78,57 @@ export const deleteDepartment = async (id) => {
   }
 };
 
+// USER_api_FUNCTIONS
+
+const toFormData = (data) => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    if (data[key] !== undefined && data[key] !== "") {
+      formData.append(key, data[key]);
+    }
+  });
+  return formData;
+};
+
+export const createUser = async (userData) => {
+  try {
+    const response = await api.post("/users", toFormData(userData));
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Create user failed");
+  }
+};
+
+export const getUsers = async () => {
+  try {
+    const response = await api.get("/users");
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetch users failed");
+  }
+};
+
+export const updateUser = async (id, userData) => {
+  try {
+    const response = await api.put(
+      `/users/${id}`,
+      toFormData(userData)
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Update user failed");
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    const response = await api.delete(`/users/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Delete user failed");
+  }
+};
+
+
 
 export default api;

@@ -3,6 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmModal from "../../utils/ConfirmModal";
+import { FaBuilding, FaBarcode } from "react-icons/fa";
 
 import {
   createDepartment,
@@ -94,7 +95,16 @@ const Departments = () => {
             Create, update & manage departments
           </small>
         </div>
-
+        <div className="row mb-4">
+          <div className="col-md-3 col-sm-6">
+            <div className="card stat-card shadow-sm">
+              <div className="card-body">
+                <h6 className="text-muted">Total Users</h6>
+                <h3 className="fw-bold mb-0">{departments.length}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* FORM */}
         <div className="card mb-4 shadow-sm">
           <div className="card-body">
@@ -103,7 +113,8 @@ const Departments = () => {
             </h6>
 
             <form className="row g-3" onSubmit={submit}>
-              <div className="col-md-5">
+              <div className="col-md-4 input-icon">
+                <FaBuilding className="mx-2" />
                 <input
                   className="form-control"
                   placeholder="Department Name"
@@ -113,7 +124,8 @@ const Departments = () => {
                 />
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-4 input-icon">
+                <FaBarcode className="mx-2" />
                 <input
                   className="form-control"
                   placeholder="Department Code"
