@@ -7,7 +7,6 @@ const AdminDashboard = () => {
       <Navbar />
       <Sidebar />
 
-      {/* MAIN CONTENT */}
       <div className="main-content">
         <h4>Admin Dashboard</h4>
 

@@ -21,7 +21,7 @@ const Login = () => {
         {/* LEFT BACKGROUND */}
         <div className="login-left col-md-6 d-none d-md-flex align-items-center justify-content-center text-white">
           <div className="text-center px-4">
-            <h1 className="fw-bold">Welcome Back !</h1>
+            <h1 className="fw-bold ">Welcome Back!</h1>
             <p className="mt-3 fs-5">
               Login to access your dashboard and manage your account.
             </p>
