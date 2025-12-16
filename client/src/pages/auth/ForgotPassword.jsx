@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
+import { FaEnvelope } from "react-icons/fa";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -14,11 +15,8 @@ export default function ForgotPassword() {
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
-
         {/* LEFT BACKGROUND */}
-        <div
-          className="col-md-6 d-none d-md-flex align-items-center justify-content-center login-left"
-        >
+        <div className="col-md-6 d-none d-md-flex align-items-center justify-content-center login-left">
           <div className="text-white text-center px-4">
             <h1 className="fw-bold">Forgot Password?</h1>
             <p className="mt-3 fs-5">
@@ -29,19 +27,25 @@ export default function ForgotPassword() {
 
         {/* RIGHT FORM */}
         <div className="col-md-6 d-flex align-items-center justify-content-center">
-          <div className="card shadow-lg p-4" style={{ maxWidth: "400px", width: "100%" }}>
+          <div
+            className="card shadow-lg p-4"
+            style={{ maxWidth: "400px", width: "100%" }}
+          >
             <h4 className="text-center mb-4">Reset Password</h4>
 
             <form onSubmit={submit}>
-              <input
-                type="email"
-                className="form-control mb-3"
-                placeholder="Enter your email"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <div className="input-icon mb-3">
+                <FaEnvelope />
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Email"
+                  required
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-              <button className="btn btn-primary w-100 mb-3">
+              <button className="btn login-left text-white w-100 mb-3">
                 Send Reset Link
               </button>
 
@@ -53,7 +57,6 @@ export default function ForgotPassword() {
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );

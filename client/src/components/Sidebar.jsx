@@ -7,8 +7,10 @@ import {
   FaBuilding,
   FaMoneyBill,
   FaCalendarCheck,
-  FaUser
+  FaUser,
+  FaTools
 } from "react-icons/fa";
+
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -41,6 +43,10 @@ const Sidebar = () => {
             <FaCalendarCheck />
             <span>Attendance</span>
           </Link>
+          <Link to="/admin/settings" className="sidebar-item">
+            <FaTools />
+            <span>Settings</span>
+          </Link>
         </>
       )}
 
@@ -64,6 +70,10 @@ const Sidebar = () => {
           <Link to="/user/attendance" className="sidebar-item">
             <FaCalendarCheck />
             <span>Attendance</span>
+          </Link>
+           <Link to="/admin/settings" className="sidebar-item">
+            <FaTools />
+            <span>Settings</span>
           </Link>
         </>
       )}

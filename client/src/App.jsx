@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 import Login from "./pages/auth/Login";
@@ -68,6 +70,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute role="admin">
+              <Attendance />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ===== USER ROUTES ===== */}
         <Route
@@ -102,11 +112,28 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/user/settings"
+          element={
+            <ProtectedRoute role="user">
+              <MyAttendance />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ===== DEFAULT / FALLBACK ===== */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
     </BrowserRouter>
   );
 }

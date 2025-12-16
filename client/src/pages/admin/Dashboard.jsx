@@ -6,9 +6,9 @@ const AdminDashboard = () => {
     <>
       <Navbar />
       <Sidebar />
-
       <div className="main-content">
-        <h4>Admin Dashboard</h4>
+        <h2 >Dashboard Overview</h2>
+        <span className="text-muted">A quick glance at system statics </span>
 
         <div className="row mt-4">
           <div className="col-md-3">
