@@ -1,0 +1,81 @@
+.sidebar {
+  width: 220px;
+  height: calc(100vh - 56px);   /* subtract navbar height */
+  position: fixed;
+  top: 56px;
+  left: 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  transition: width 0.3s ease;
+}
+
+
+/* Menu Items */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffffcc;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: 0.2s;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ICON SIZE */
+.sidebar-item svg {
+  font-size: 18px;
+}
+
+.app-navbar {
+  height: 56px;
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+
+/* Brand */
+.app-navbar .navbar-brand {
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+/* Username */
+.user-name {
+  color: #ffffffcc;
+  font-size: 0.9rem;
+}
+
+
+/* 📱 MOBILE VIEW → ICON ONLY */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar-title {
+    display: none;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+  }
+
+  .sidebar-item span {
+    display: none;
+  }
+}

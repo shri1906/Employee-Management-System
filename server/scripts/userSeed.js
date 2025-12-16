@@ -10,7 +10,7 @@ const createAdmin = async () => {
     // Connect to DB
     await connectDB();
 
-    const email = "shivammaurya7310@gmail.com";
+    const email = "user@gmail.com";
 
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email });
@@ -20,16 +20,16 @@ const createAdmin = async () => {
     }
 
     // Hash password
-    const hashedPassword = bcrypt.hashSync("Admin@123", 10);
+    const hashedPassword = bcrypt.hashSync("User@123", 10);
 
     // Create admin user (MATCHING SCHEMA)
     const admin = await User.create({
-      name: "System Admin",
+      name: "User",
       email,
       password: hashedPassword,
-      role: "admin",
-      designation: "Administrator",
-      phone: "7310941087",
+      role: "user",
+      designation: "IT Specialist",
+      phone: "1234567890",
       isActive: true,
       department: null,               // admin may not belong to a department
       resetPasswordToken: undefined,
@@ -39,7 +39,7 @@ const createAdmin = async () => {
     console.log("✅ Admin user created successfully");
     console.log({
       email: admin.email,
-      password: "Admin@123",
+      password: "User@123",
       role: admin.role
     });
 

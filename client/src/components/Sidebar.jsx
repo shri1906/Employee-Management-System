@@ -1,29 +1,70 @@
 import { Link } from "react-router-dom";
+import "./sidebar.css"
 import { useAuth } from "../context/AuthContext";
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaBuilding,
+  FaMoneyBill,
+  FaCalendarCheck,
+  FaUser
+} from "react-icons/fa";
 
 const Sidebar = () => {
   const { user } = useAuth();
 
   return (
-    <div className="bg-light border-end vh-100 p-3" style={{ width: 220 }}>
-      <h6 className="mb-3">Menu</h6>
-
+    <div className="sidebar">
       {user?.role === "admin" && (
         <>
-          <Link className="d-block mb-2" to="/admin">Dashboard</Link>
-          <Link className="d-block mb-2" to="/admin/departments">Departments</Link>
-          <Link className="d-block mb-2" to="/admin/users">Users</Link>
-          <Link className="d-block mb-2" to="/admin/salary">Salary</Link>
-          <Link className="d-block mb-2" to="/admin/attendance">Attendance</Link>
+          <Link to="/admin" className="sidebar-item">
+            <FaTachometerAlt />
+            <span>Dashboard</span>
+          </Link>
+
+          <Link to="/admin/departments" className="sidebar-item">
+            <FaBuilding />
+            <span>Departments</span>
+          </Link>
+
+          <Link to="/admin/users" className="sidebar-item">
+            <FaUsers />
+            <span>Users</span>
+          </Link>
+
+          <Link to="/admin/salary" className="sidebar-item">
+            <FaMoneyBill />
+            <span>Salary</span>
+          </Link>
+
+          <Link to="/admin/attendance" className="sidebar-item">
+            <FaCalendarCheck />
+            <span>Attendance</span>
+          </Link>
         </>
       )}
 
       {user?.role === "user" && (
         <>
-          <Link className="d-block mb-2" to="/user">Dashboard</Link>
-          <Link className="d-block mb-2" to="/user/profile">Profile</Link>
-          <Link className="d-block mb-2" to="/user/salary">Salary</Link>
-          <Link className="d-block mb-2" to="/user/attendance">Attendance</Link>
+          <Link to="/user" className="sidebar-item">
+            <FaTachometerAlt />
+            <span>Dashboard</span>
+          </Link>
+
+          <Link to="/user/profile" className="sidebar-item">
+            <FaUser />
+            <span>Profile</span>
+          </Link>
+
+          <Link to="/user/salary" className="sidebar-item">
+            <FaMoneyBill />
+            <span>Salary</span>
+          </Link>
+
+          <Link to="/user/attendance" className="sidebar-item">
+            <FaCalendarCheck />
+            <span>Attendance</span>
+          </Link>
         </>
       )}
     </div>

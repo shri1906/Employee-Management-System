@@ -5,10 +5,16 @@ const Profile = () => {
   return (
     <>
       <Navbar />
-      <div className="d-flex">
-        <Sidebar />
-        <div className="p-4 w-100">
-          <h4>My Profile</h4>
+      <Sidebar />
+      <div className="main-content">
+        <div className="row mt-4">
+          <div className="col-md-3">
+            <div className="card text-center shadow-sm">
+              <div className="card-body">
+                <h4>My Profile</h4>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
