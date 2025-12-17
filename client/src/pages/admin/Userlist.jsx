@@ -12,8 +12,6 @@ import {
   FaBuilding,
   FaIdBadge,
   FaPhone,
-  FaToggleOn,
-  FaToggleOff,
 } from "react-icons/fa";
 
 import { getUsers, updateUser, getDepartments } from "../../services/api";
@@ -31,7 +29,7 @@ const Userlist = () => {
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
-
+  const [profileImage, setProfileImage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingUser, setPendingUser] = useState(null);
 
@@ -103,6 +101,7 @@ const Userlist = () => {
       designation: u.designation || "",
       phone: u.phone || "",
     });
+    setProfileImage(null);
   };
 
   const submitUpdate = async (e) => {
@@ -110,9 +109,22 @@ const Userlist = () => {
     setLoading(true);
 
     try {
-      await updateUser(editingUser._id, form);
+      const formData = new FormData();
+
+      Object.keys(form).forEach((key) => {
+        formData.append(key, form[key]);
+      });
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      await updateUser(editingUser._id, formData);
+
       toast.success("User updated successfully");
       setEditingUser(null);
+      setProfileImage(null);
+
       fetchData();
     } catch (err) {
       toast.error(err.message);
@@ -151,12 +163,9 @@ const Userlist = () => {
 
       <div className="main-content">
         <div className="mb-4">
-          <span className="dashboard-accent"></span>
-          <div>
-            <h4>User List</h4>
-            <small className="text-muted">Manage system users</small>
-            <div>Total Users: {users.length}</div>
-          </div>
+          <h4>User List</h4>
+          <small className="text-muted">Manage system users</small>
+          <div>Total Users: {users.length}</div>
         </div>
 
         <div className="row g-2 mb-3">
@@ -197,82 +206,87 @@ const Userlist = () => {
         <div className="card shadow-sm">
           <div className="card-body">
             <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Designation</th>
-                  <th>Department</th>
-                  <th>Status</th>
-                  <th width="200">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedUsers.map((u) => (
-                  <tr key={u._id} className={!u.isActive ? "table-light" : ""}>
-                    <td>{u.name}</td>
-                    <td>{u.email}</td>
-                    <td>{u.role}</td>
-                    <td>{u.designation||"-"}</td>
-                    <td>{u.department?.name || "-"}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          u.isActive ? "bg-success" : "bg-secondary"
-                        }`}
-                      >
-                        {u.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary m-1"
-                        disabled={!u.isActive}
-                        onClick={() => edit(u)}
-                        title={!u.isActive ? "Inactive user" : ""}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className={`btn btn-sm m-1 ${
-                          u.isActive
-                            ? "btn-outline-warning"
-                            : "btn-outline-success"
-                        }`}
-                        disabled={u.role === "admin" && u.isActive}
-                        title={
-                          u.role === "admin"
-                            ? "Admin cannot be inactivated"
-                            : ""
-                        }
-                        onClick={() => toggleStatus(u)}
-                      >
-                        {u.isActive ? (
-                          <>
-                            Inactivate
-                          </>
-                        ) : (
-                          <>
-                            Activate
-                          </>
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-
-                {paginatedUsers.length === 0 && (
+              <table className="table table-hover align-middle">
+                <thead>
                   <tr>
-                    <td colSpan="6" className="text-center text-muted">
-                      No users found
-                    </td>
+                    <th>Profile Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Designation</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th width="200">Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginatedUsers.map((u) => (
+                    <tr
+                      key={u._id}
+                      className={!u.isActive ? "table-light" : ""}
+                    >
+                      <td>
+                        <img
+                          src={`http://localhost:5000${u.profileImage}`}
+                          alt="Profile"
+                          className="rounded-circle"
+                          width="40"
+                          height="40"
+                        />
+                      </td>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>{u.role}</td>
+                      <td>{u.designation || "-"}</td>
+                      <td>{u.department?.name || "-"}</td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            u.isActive ? "bg-success" : "bg-secondary"
+                          }`}
+                        >
+                          {u.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-primary m-1"
+                          disabled={!u.isActive}
+                          onClick={() => edit(u)}
+                          title={!u.isActive ? "Inactive user" : ""}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className={`btn btn-sm m-1 ${
+                            u.isActive
+                              ? "btn-outline-warning"
+                              : "btn-outline-success"
+                          }`}
+                          disabled={u.role === "admin" && u.isActive}
+                          title={
+                            u.role === "admin"
+                              ? "Admin cannot be inactivated"
+                              : ""
+                          }
+                          onClick={() => toggleStatus(u)}
+                        >
+                          {u.isActive ? <>Inactivate</> : <>Activate</>}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {paginatedUsers.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="text-center text-muted">
+                        No users found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
 
             {/* PAGINATION */}
@@ -388,6 +402,18 @@ const Userlist = () => {
                           onChange={(e) =>
                             setForm({ ...form, phone: e.target.value })
                           }
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="form-control"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            setProfileImage(file);
+                          }}
                         />
                       </div>
                     </div>

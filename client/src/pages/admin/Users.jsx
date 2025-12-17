@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
@@ -20,6 +20,9 @@ import { createUser, getDepartments } from "../../services/api";
 const Users = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  // const [preview, setPreview] = useState(null);
+  const fileInputRef = useRef();
 
   const [form, setForm] = useState({
     name: "",
@@ -42,7 +45,18 @@ const Users = () => {
     setLoading(true);
 
     try {
-      await createUser(form);
+      const formData = new FormData();
+
+      Object.keys(form).forEach((key) => {
+        formData.append(key, form[key]);
+      });
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      await createUser(formData);
+
       toast.success("User created successfully");
 
       setForm({
@@ -54,6 +68,12 @@ const Users = () => {
         designation: "",
         phone: "",
       });
+
+      setProfileImage(null);
+      // setPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -72,9 +92,7 @@ const Users = () => {
           <span className="dashboard-accent"></span>
           <div>
             <h4>Create User</h4>
-            <small className="text-muted">
-              Add a new system user
-            </small>
+            <small className="text-muted">Add a new system user</small>
           </div>
         </div>
 
@@ -102,9 +120,7 @@ const Users = () => {
                   placeholder="Full Name"
                   required
                   value={form.name}
-                  onChange={(e) =>
-                    setForm({ ...form, name: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
 
@@ -116,9 +132,7 @@ const Users = () => {
                   placeholder="Email"
                   required
                   value={form.email}
-                  onChange={(e) =>
-                    setForm({ ...form, email: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
 
@@ -141,9 +155,7 @@ const Users = () => {
                 <select
                   className="form-control px-4"
                   value={form.role}
-                  onChange={(e) =>
-                    setForm({ ...form, role: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -186,12 +198,35 @@ const Users = () => {
                   className="form-control"
                   placeholder="Phone"
                   value={form.phone}
-                  onChange={(e) =>
-                    setForm({ ...form, phone: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
               </div>
-              
+              <div className="col-md-6 ">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-control"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    setProfileImage(file);
+                    // setPreview(URL.createObjectURL(file));
+                  }}
+                />
+              </div>
+              {/* {preview && (
+                <div className="mt-2 d-flex justify-content-center">
+                  <img
+                    src={preview}
+                    alt="preview"
+                    className="rounded"
+                    width="100"
+                    height="100"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              )} */}
+
               <div className="col-12">
                 <button
                   className="btn login-left text-white w-40"

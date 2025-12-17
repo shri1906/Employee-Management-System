@@ -12,6 +12,8 @@ import {
   deleteDepartment,
 } from "../../services/api";
 
+const ITEMS_PER_PAGE = 5; 
+
 const Departments = () => {
   const [departments, setDepartments] = useState([]);
   const [name, setName] = useState("");
@@ -21,11 +23,13 @@ const Departments = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchDepartments = async () => {
     try {
       const data = await getDepartments();
       setDepartments(data);
+      setCurrentPage(1); 
     } catch (err) {
       toast.error(err.message);
     }
@@ -83,29 +87,37 @@ const Departments = () => {
     }
   };
 
+  const totalPages = Math.ceil(departments.length / ITEMS_PER_PAGE);
+
+  const paginatedDepartments = departments.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <>
       <Navbar />
       <Sidebar />
+
       <div className="main-content">
-        {/* HEADER */}
         <div className="mb-4">
           <h4>Departments</h4>
           <small className="text-muted">
             Create, update & manage departments
           </small>
         </div>
+
         <div className="row mb-4">
           <div className="col-md-3 col-sm-6">
             <div className="card stat-card shadow-sm">
               <div className="card-body">
-                <h6 className="text-muted">Total Users</h6>
+                <h6 className="text-muted">Total Departments</h6>
                 <h3 className="fw-bold mb-0">{departments.length}</h3>
               </div>
             </div>
           </div>
         </div>
-        {/* FORM */}
+
         <div className="card mb-4 shadow-sm">
           <div className="card-body">
             <h6 className="mb-3">
@@ -141,7 +153,11 @@ const Departments = () => {
                   className="btn login-left text-white w-100"
                   disabled={loading}
                 >
-                  {loading ? "Saving..." : editingId ? "Update" : "Add"}
+                  {loading
+                    ? "Saving..."
+                    : editingId
+                    ? "Update"
+                    : "Add"}
                 </button>
               </div>
             </form>
@@ -151,7 +167,7 @@ const Departments = () => {
         <div className="card shadow-sm">
           <div className="table-responsive">
             <div className="card-body">
-              <table className="table table-hover">
+              <table className="table table-hover align-middle text-nowrap">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -161,7 +177,7 @@ const Departments = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {departments.map((d) => (
+                  {paginatedDepartments.map((d) => (
                     <tr key={d._id}>
                       <td>{d.name}</td>
                       <td>{d.code}</td>
@@ -175,23 +191,25 @@ const Departments = () => {
                         </span>
                       </td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-outline-primary m-1"
-                          onClick={() => edit(d)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger m-1"
-                          onClick={() => remove(d._id)}
-                        >
-                          Delete
-                        </button>
+                        <div className="d-flex flex-column flex-md-row gap-2">
+                          <button
+                            className="btn btn-sm btn-outline-primary w-100 w-md-auto"
+                            onClick={() => edit(d)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger w-100 w-md-auto"
+                            onClick={() => remove(d._id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
 
-                  {departments.length === 0 && (
+                  {paginatedDepartments.length === 0 && (
                     <tr>
                       <td colSpan="4" className="text-center text-muted">
                         No departments found
@@ -200,10 +218,35 @@ const Departments = () => {
                   )}
                 </tbody>
               </table>
+
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-end align-items-center gap-2 mt-3">
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                  >
+                    Prev
+                  </button>
+
+                  <span className="text-muted">
+                    Page {currentPage} of {totalPages}
+                  </span>
+
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
       <ConfirmModal
         show={showConfirm}
         title="Confirm Delete"

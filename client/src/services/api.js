@@ -80,19 +80,21 @@ export const deleteDepartment = async (id) => {
 
 // USER_api_FUNCTIONS
 
-const toFormData = (data) => {
-  const formData = new FormData();
-  Object.keys(data).forEach((key) => {
-    if (data[key] !== undefined && data[key] !== "") {
-      formData.append(key, data[key]);
-    }
-  });
-  return formData;
-};
+// const toFormData = (data) => {
+//   const formData = new FormData();
+//   Object.keys(data).forEach((key) => {
+//     if (data[key] !== undefined && data[key] !== "") {
+//       formData.append(key, data[key]);
+//     }
+//   });
+//   return formData;
+// };
 
 export const createUser = async (userData) => {
   try {
-    const response = await api.post("/users", toFormData(userData));
+     const response = await api.post("/users", userData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Create user failed");
@@ -108,17 +110,19 @@ export const getUsers = async () => {
   }
 };
 
-export const updateUser = async (id, userData) => {
+export const updateUser = async (id, data) => {
   try {
-    const response = await api.put(
-      `/users/${id}`,
-      toFormData(userData)
-    );
+    const response = await api.put(`/users/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Update user failed");
   }
 };
+
 
 export const deleteUser = async (id) => {
   try {

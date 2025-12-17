@@ -7,11 +7,14 @@ exports.create = async (req, res) => {
   try {
     const { name, email, password, role, department, designation, phone } =
       req.body;
+
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
       email,
@@ -20,6 +23,7 @@ exports.create = async (req, res) => {
       department,
       designation,
       phone,
+      profileImage: req.file ? `/uploads/users/${req.file.filename}` : null,
     });
 
     res.json(user);
@@ -27,6 +31,7 @@ exports.create = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 // GET ALL USERS
@@ -60,11 +65,14 @@ exports.update = async (req, res) => {
   try {
     const updateData = { ...req.body };
 
-    // Hash password ONLY if provided
     if (req.body.password && req.body.password.trim() !== "") {
       updateData.password = await bcrypt.hash(req.body.password, 10);
     } else {
       delete updateData.password;
+    }
+
+    if (req.file) {
+      updateData.profileImage = `/uploads/users/${req.file.filename}`;
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updateData, {
@@ -76,6 +84,7 @@ exports.update = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // DELETE USER
 exports.remove = async (req, res) => {
