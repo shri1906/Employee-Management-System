@@ -19,6 +19,7 @@ import MySalary from "./pages/user/Salary";
 import MyAttendance from "./pages/user/Attendance";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Userlist  from "./pages/admin/Userlist";
 
 function App() {
   return (
@@ -75,6 +76,14 @@ function App() {
           element={
             <ProtectedRoute role="admin">
               <Attendance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/userlist"
+          element={
+            <ProtectedRoute role="admin">
+              <Userlist />
             </ProtectedRoute>
           }
         />

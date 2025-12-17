@@ -13,7 +13,7 @@ const ConfirmModal = ({ show, title, message, onConfirm, onCancel }) => {
             Cancel
           </button>
           <button className="btn btn-danger" onClick={onConfirm}>
-            Delete
+            Confirm
           </button>
         </div>
       </div>

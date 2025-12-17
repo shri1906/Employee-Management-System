@@ -148,58 +148,59 @@ const Departments = () => {
           </div>
         </div>
 
-        {/* LIST */}
         <div className="card shadow-sm">
-          <div className="card-body">
-            <table className="table table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Code</th>
-                  <th>Status</th>
-                  <th width="140">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departments.map((d) => (
-                  <tr key={d._id}>
-                    <td>{d.name}</td>
-                    <td>{d.code}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          d.isActive ? "bg-success" : "bg-secondary"
-                        }`}
-                      >
-                        {d.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => edit(d)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => remove(d._id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-
-                {departments.length === 0 && (
+          <div className="table-responsive">
+            <div className="card-body">
+              <table className="table table-hover">
+                <thead>
                   <tr>
-                    <td colSpan="4" className="text-center text-muted">
-                      No departments found
-                    </td>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Status</th>
+                    <th width="140">Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {departments.map((d) => (
+                    <tr key={d._id}>
+                      <td>{d.name}</td>
+                      <td>{d.code}</td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            d.isActive ? "bg-success" : "bg-secondary"
+                          }`}
+                        >
+                          {d.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-primary m-1"
+                          onClick={() => edit(d)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger m-1"
+                          onClick={() => remove(d._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {departments.length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="text-center text-muted">
+                        No departments found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
