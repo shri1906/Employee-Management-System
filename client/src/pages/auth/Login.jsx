@@ -3,6 +3,7 @@ import { login as apiLogin } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const Login = () => {
       window.location.href =
         user.role === "admin" ? "/admin" : "/user";
     } catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message ||
         err.message ||
         "Login failed"

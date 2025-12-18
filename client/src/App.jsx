@@ -12,11 +12,13 @@ import Departments from "./pages/admin/Departments";
 import Users from "./pages/admin/Users";
 import Salary from "./pages/admin/Salary";
 import Attendance from "./pages/admin/Attendance";
+import Leaves from "./pages/admin/Leaves";
 
 import UserDashboard from "./pages/user/Dashboard";
 import Profile from "./pages/user/Profile";
 import MySalary from "./pages/user/Salary";
 import MyAttendance from "./pages/user/Attendance";
+import MyLeaves from "./pages/user/MyLeaves";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Userlist  from "./pages/admin/Userlist";
@@ -72,6 +74,14 @@ function App() {
           }
         />
         <Route
+          path="/admin/leaves"
+          element={
+            <ProtectedRoute role="admin">
+              <Leaves />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/settings"
           element={
             <ProtectedRoute role="admin">
@@ -118,6 +128,14 @@ function App() {
           element={
             <ProtectedRoute role="user">
               <MyAttendance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/leaves"
+          element={
+            <ProtectedRoute role="user">
+              <MyLeaves />
             </ProtectedRoute>
           }
         />

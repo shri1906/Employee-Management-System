@@ -8,7 +8,8 @@ import {
   FaMoneyBill,
   FaCalendarCheck,
   FaUser,
-  FaTools
+  FaTools,
+  FaCalendarAlt
 } from "react-icons/fa";
 
 
@@ -43,6 +44,10 @@ const Sidebar = () => {
             <FaCalendarCheck />
             <span>Attendance</span>
           </Link>
+          <Link to="/admin/leaves" className="sidebar-item">
+            <FaCalendarAlt />
+            <span>Leaves</span>
+          </Link>
           <Link to="/admin/settings" className="sidebar-item">
             <FaTools />
             <span>Settings</span>
@@ -70,6 +75,10 @@ const Sidebar = () => {
           <Link to="/user/attendance" className="sidebar-item">
             <FaCalendarCheck />
             <span>Attendance</span>
+          </Link>
+          <Link to="/user/leaves" className="sidebar-item">
+            <FaCalendarAlt />
+            <span>Leaves</span>
           </Link>
            <Link to="/admin/settings" className="sidebar-item">
             <FaTools />

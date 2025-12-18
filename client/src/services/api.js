@@ -122,6 +122,112 @@ export const deleteUser = async (id) => {
 };
 
 
+// =========================
+// ATTENDANCE API FUNCTIONS
+// =========================
+
+// ADMIN: Get today's attendance
+export const getTodayAttendance = async () => {
+  try {
+    const response = await api.get("/attendance/today");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch today's attendance failed"
+    );
+  }
+};
+
+// ADMIN: Mark / update attendance
+export const markAttendance = async (data) => {
+  try {
+    const response = await api.post("/attendance/mark", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Mark attendance failed"
+    );
+  }
+};
+
+// USER: Get own attendance
+export const myAttendance = async () => {
+  try {
+    const response = await api.get("/attendance/me");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch attendance failed"
+    );
+  }
+};
+
+// ADMIN: Monthly attendance report
+export const monthlyAttendanceReport = async (month, year) => {
+  try {
+    const response = await api.get(
+      `/attendance/monthly-report?month=${month}&year=${year}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch monthly report failed"
+    );
+  }
+};
+
+// =========================
+// LEAVE API FUNCTIONS
+// =========================
+
+// USER: Apply leave
+export const applyLeave = async (data) => {
+  try {
+    const response = await api.post("/leave", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Apply leave failed"
+    );
+  }
+};
+
+// USER: My leaves
+export const myLeaves = async () => {
+  try {
+    const response = await api.get("/leave/me");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch my leaves failed"
+    );
+  }
+};
+
+// ADMIN: Get all leaves
+export const getAllLeaves = async () => {
+  try {
+    const response = await api.get("/leave");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch all leaves failed"
+    );
+  }
+};
+
+// ADMIN: Approve / reject leave
+export const updateLeaveStatus = async (id, status) => {
+  try {
+    const response = await api.put(`/leave/${id}`, { status });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Update leave status failed"
+    );
+  }
+};
+
 
 
 export default api;

@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import api from "../../services/api";
+import { toast } from "react-toastify";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -8,7 +9,7 @@ export default function ResetPassword() {
 
   const submit = async () => {
     await api.post(`/auth/reset-password/${token}`, { password });
-    alert("Password reset successful");
+    toast.success("Password reset successful");
     window.location.href = "/login";
   };
 

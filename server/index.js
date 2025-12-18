@@ -40,7 +40,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/attendance", attendanceRoutes);
-app.use("/api/leaves", leaveRoutes);
+app.use("/api/leave", leaveRoutes);
 
 // ===== 404 HANDLER =====
 app.use((req, res) => {

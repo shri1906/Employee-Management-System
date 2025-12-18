@@ -1,12 +1,4 @@
-// import express from "express";
-// import auth from "../middleware/authMiddleware.js";
-// import role from "../middleware/roleMiddleware.js";
-// import {
-//   addLeave,
-//   myLeaves,
-//   getAllLeaves,
-//   updateLeave,
-// } from "../controllers/leaveController.js";
+
 const express = require("express");
 const auth = require("../middleware/authMiddleware");
 const role = require("../middleware/roleMiddleware"); 
