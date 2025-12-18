@@ -1,13 +1,11 @@
 const Attendance = require("../models/Attendance.js");
 const User = require("../models/User.js");
 
-/**
- * ADMIN: Get today's attendance (all users)
- */
+//  ADMIN: Get today's attendance (all users)
+
 exports.getTodayAttendance = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date(new Date().toLocaleDateString("en-CA"));
 
     const attendance = await Attendance.find({ date: today })
       .populate("userId", "name email")
@@ -20,15 +18,13 @@ exports.getTodayAttendance = async (req, res) => {
   }
 };
 
-/**
- * ADMIN: Mark / Update attendance for today
- */
+// ADMIN: Mark / Update attendance for today
+
 exports.markAttendance = async (req, res) => {
   try {
     const { userId, departmentId, status } = req.body;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date(new Date().toLocaleDateString("en-CA"));
 
     const attendance = await Attendance.findOneAndUpdate(
       { userId, date: today },
@@ -52,17 +48,15 @@ exports.markAttendance = async (req, res) => {
   }
 };
 
-/**
- * ADMIN: Attendance report (date-wise)
- */
+//  ADMIN: Attendance report (date-wise)
+
 exports.attendanceReport = async (req, res) => {
   try {
     const { date } = req.query;
     const query = {};
 
     if (date) {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
+      const d = new Date(new Date(date).toLocaleDateString("en-CA"));
       query.date = d;
     }
 
@@ -77,9 +71,8 @@ exports.attendanceReport = async (req, res) => {
   }
 };
 
-/**
- * ADMIN: Monthly Attendance Summary
- */
+//  ADMIN: Monthly Attendance Summary
+
 exports.monthlyAttendanceReport = async (req, res) => {
   try {
     const { month, year } = req.query;
@@ -113,9 +106,8 @@ exports.monthlyAttendanceReport = async (req, res) => {
         };
       }
 
-      result[uid].attendance[
-        rec.date.toISOString().split("T")[0]
-      ] = rec.status.charAt(0);
+      result[uid].attendance[rec.date.toLocaleDateString("en-CA")] =
+        rec.status.charAt(0);
     });
 
     return res.status(200).json({
@@ -127,9 +119,8 @@ exports.monthlyAttendanceReport = async (req, res) => {
   }
 };
 
-/**
- * USER: View own attendance
- */
+// USER: View own attendance
+
 exports.myAttendance = async (req, res) => {
   try {
     const attendance = await Attendance.find({ userId: req.user._id })
@@ -137,6 +128,39 @@ exports.myAttendance = async (req, res) => {
       .populate("departmentId", "name");
 
     return res.status(200).json({ success: true, attendance });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// USER: Monthly Attendance (own only)
+exports.myMonthlyAttendance = async (req, res) => {
+  try {
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Month & Year required" });
+    }
+
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0);
+
+    const attendance = await Attendance.find({
+      userId: req.user._id, // ✅ ONLY OWN DATA
+      date: { $gte: start, $lte: end },
+    }).sort({ date: 1 });
+
+    const result = {};
+
+    attendance.forEach((rec) => {
+      result[rec.date.toLocaleDateString("en-CA")] = rec.status.charAt(0); // P / A / L / S
+    });
+    return res.status(200).json({
+      success: true,
+      attendance: result,
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

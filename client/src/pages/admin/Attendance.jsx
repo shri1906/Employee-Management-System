@@ -2,6 +2,8 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import { getTodayAttendance, markAttendance } from "../../services/api";
+import { FaClipboardList } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const statuses = ["Present", "Absent", "Leave", "Sick"];
 
@@ -24,7 +26,6 @@ const Attendance = () => {
     try {
       await markAttendance({ userId, departmentId, status });
 
-      // re-fetch attendance safely
       const res = await getTodayAttendance();
       setList(res.attendance);
     } catch (err) {
@@ -38,6 +39,17 @@ const Attendance = () => {
       <Sidebar />
       <div className="main-content">
         <h4>Attendance Management</h4>
+        <div className="row mb-4 justify-content-end">
+          <div className="col-md-2 d-flex justify-content-end">
+            <Link
+              to="/admin/monthly-attendance-report"
+              className="btn login-left text-white d-flex align-items-center gap-2"
+            >
+              <FaClipboardList />
+              <span>Monthly Report</span>
+            </Link>
+          </div>
+        </div>
         <div className="row mt-4">
           <div className="card-body table-responsive">
             <table className="table table-bordered table-hover align-middle">

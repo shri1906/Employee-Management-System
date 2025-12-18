@@ -22,6 +22,8 @@ import MyLeaves from "./pages/user/MyLeaves";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Userlist  from "./pages/admin/Userlist";
+import MonthlyAttendanceAdmin from "./pages/admin/MonthlyAttendanceAdmin";
+import MonthlyAttendanceUser from "./pages/user/MonthlyAttendanceUSer";
 
 function App() {
   return (
@@ -97,6 +99,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/monthly-attendance-report"
+          element={
+            <ProtectedRoute role="admin">
+              <MonthlyAttendanceAdmin />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ===== USER ROUTES ===== */}
         <Route
@@ -136,6 +146,14 @@ function App() {
           element={
             <ProtectedRoute role="user">
               <MyLeaves />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/monthly-attendance-report"
+          element={
+            <ProtectedRoute role="user">
+              <MonthlyAttendanceUser />
             </ProtectedRoute>
           }
         />

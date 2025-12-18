@@ -176,9 +176,20 @@ export const monthlyAttendanceReport = async (month, year) => {
   }
 };
 
-// =========================
-// LEAVE API FUNCTIONS
-// =========================
+// USER: Monthly attendance
+export const myMonthlyAttendance = async (month, year) => {
+  try {
+    const response = await api.get(
+      `/attendance/my-monthly?month=${month}&year=${year}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch monthly attendance failed"
+    );
+  }
+};
+
 
 // USER: Apply leave
 export const applyLeave = async (data) => {

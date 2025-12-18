@@ -13,5 +13,6 @@ router.get("/monthly-report", auth, role("admin"), ctrl.monthlyAttendanceReport)
 
 /** USER */
 router.get("/me", auth, ctrl.myAttendance);
+router.get("/my-monthly", auth, ctrl.myMonthlyAttendance);
 
 module.exports = router;
