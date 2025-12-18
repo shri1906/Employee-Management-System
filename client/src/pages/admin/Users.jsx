@@ -13,6 +13,7 @@ import {
   FaBuilding,
   FaIdBadge,
   FaPhone,
+  FaList,
 } from "react-icons/fa";
 
 import { createUser, getDepartments } from "../../services/api";
@@ -102,8 +103,8 @@ const Users = () => {
               to="/admin/userlist"
               className="btn login-left text-white d-flex align-items-center gap-2"
             >
-              <FaUser />
-              <span>View Users</span>
+              <FaList />
+              <span>Userlist</span>
             </Link>
           </div>
         </div>

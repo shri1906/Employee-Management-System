@@ -10,6 +10,7 @@ const userRoutes = require("./routes/userRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const salaryRoutes = require("./routes/salaryRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
+const leaveRoutes = require("./routes/leaveRoutes");
 dotenv.config();
 
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/leaves", leaveRoutes);
 
 // ===== 404 HANDLER =====
 app.use((req, res) => {

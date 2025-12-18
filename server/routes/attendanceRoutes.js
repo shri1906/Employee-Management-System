@@ -1,10 +1,17 @@
-const router = require("express").Router();
+const express = require("express");
 const auth = require("../middleware/authMiddleware");
-const admin = require("../middleware/roleMiddleware")("admin");
+const role = require("../middleware/roleMiddleware");
 const ctrl = require("../controllers/attendanceController");
 
-router.post("/", auth, admin, ctrl.create);
-router.get("/", auth, admin, ctrl.getAll);
-router.get("/me", auth, ctrl.getMine);
+const router = express.Router();
+
+/** ADMIN */
+router.get("/today", auth, role("admin"), ctrl.getTodayAttendance);
+router.post("/mark", auth, role("admin"), ctrl.markAttendance);
+router.get("/report", auth, role("admin"), ctrl.attendanceReport);
+router.get("/monthly-report", auth, role("admin"), ctrl.monthlyAttendanceReport);
+
+/** USER */
+router.get("/me", auth, ctrl.myAttendance);
 
 module.exports = router;

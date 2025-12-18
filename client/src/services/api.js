@@ -78,18 +78,6 @@ export const deleteDepartment = async (id) => {
   }
 };
 
-// USER_api_FUNCTIONS
-
-// const toFormData = (data) => {
-//   const formData = new FormData();
-//   Object.keys(data).forEach((key) => {
-//     if (data[key] !== undefined && data[key] !== "") {
-//       formData.append(key, data[key]);
-//     }
-//   });
-//   return formData;
-// };
-
 export const createUser = async (userData) => {
   try {
      const response = await api.post("/users", userData, {
@@ -132,6 +120,7 @@ export const deleteUser = async (id) => {
     throw new Error(error.response?.data?.message || "Delete user failed");
   }
 };
+
 
 
 
