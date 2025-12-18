@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { monthlyAttendanceReport } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
@@ -9,18 +9,26 @@ export default function MonthlyAttendanceAdmin() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [data, setData] = useState([]);
 
-  const fetchReport = useCallback(async () => {
-    try {
-      const res = await monthlyAttendanceReport(month, year);
-      setData(res.data || []);
-    } catch (err) {
-      toast.error(err.message || "Failed to load monthly report");
-    }
-  }, [month, year]);
+const fetchReport = async () => {
+      try {
+        const res = await monthlyAttendanceReport(month, year); 
+        setData(res.data || []);
+      } catch (err) {
+        toast.error(err.message || "Failed to load monthly report");
+      } 
+    };
 
   useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const res = await monthlyAttendanceReport(month, year); 
+        setData(res.data || []);
+      } catch (err) {
+        toast.error(err.message || "Failed to load monthly report");
+      } 
+    };
     fetchReport();
-  }, [fetchReport]);
+  }, [month, year]);
 
   // 📅 Days in selected month
   const daysInMonth = new Date(year, month, 0).getDate();
