@@ -5,18 +5,42 @@ const User = require("../models/User.js");
 
 exports.getTodayAttendance = async (req, res) => {
   try {
-    const today = new Date(new Date().toLocaleDateString("en-CA"));
+   
+    const today = new Date(new Date().toLocaleDateString("en-US", { timeZone: "+05:30" }));
+    const users = await User.find({ role: "user" })
+      .populate("department", "name")
+      .select("_id name department");
 
-    const attendance = await Attendance.find({ date: today })
-      .populate("userId", "name email")
-      .populate("departmentId", "name code")
-      .populate("markedBy", "name");
+    const attendance = await Attendance.find({ date: today });
+    const attendanceMap = {};
+    attendance.forEach((a) => {
+      attendanceMap[a.userId.toString()] = a;
+    });
 
-    return res.status(200).json({ success: true, attendance });
+    const result = users.map((user) => {
+      const record = attendanceMap[user._id.toString()];
+
+      return {
+        userId: user._id,
+        name: user.name,
+        departmentId: user.department?._id || null,
+        departmentName: user.department?.name || "-",
+        status: record ? record.status : "Absent", 
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      attendance: result,
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 // ADMIN: Mark / Update attendance for today
 
@@ -24,7 +48,7 @@ exports.markAttendance = async (req, res) => {
   try {
     const { userId, departmentId, status } = req.body;
 
-    const today = new Date(new Date().toLocaleDateString("en-CA"));
+    const today = new Date(new Date().toLocaleDateString("en-US", { timeZone: "+05:30" }));
 
     const attendance = await Attendance.findOneAndUpdate(
       { userId, date: today },
@@ -56,7 +80,7 @@ exports.attendanceReport = async (req, res) => {
     const query = {};
 
     if (date) {
-      const d = new Date(new Date(date).toLocaleDateString("en-CA"));
+      const d = new Date(new Date(date).toLocaleDateString("en-US", { timeZone: "+05:30" }));
       query.date = d;
     }
 
@@ -106,7 +130,7 @@ exports.monthlyAttendanceReport = async (req, res) => {
         };
       }
 
-      result[uid].attendance[rec.date.toLocaleDateString("en-CA")] =
+      result[uid].attendance[rec.date.toLocaleDateString("en-US", { timeZone: "+05:30" })] =
         rec.status.charAt(0);
     });
 
@@ -155,7 +179,7 @@ exports.myMonthlyAttendance = async (req, res) => {
     const result = {};
 
     attendance.forEach((rec) => {
-      result[rec.date.toLocaleDateString("en-CA")] = rec.status.charAt(0); // P / A / L / S
+      result[rec.date.toLocaleDateString("en-US", { timeZone: "+05:30" })] = rec.status.charAt(0); // P / A / L / S
     });
     return res.status(200).json({
       success: true,

@@ -66,7 +66,7 @@ export default function MonthlyAttendanceUser() {
             />
           </div>
           <div className="col-md-3 align-self-end">
-            <button className="btn btn-primary" onClick={fetchReport}>
+            <button className="btn login-left text-white" onClick={fetchReport}>
               Fetch Report
             </button>
           </div>

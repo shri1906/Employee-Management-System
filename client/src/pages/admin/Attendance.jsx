@@ -61,29 +61,39 @@ const Attendance = () => {
                 </tr>
               </thead>
               <tbody>
-                {list.map((row) => (
-                  <tr key={row._id}>
-                    <td>{row.userId?.name}</td>
-                    <td>{row.departmentId?.name}</td>
-                    <td>
-                      <select
-                        className="form-select"
-                        value={row.status}
-                        onChange={(e) =>
-                          handleChange(
-                            row.userId._id,
-                            row.departmentId._id,
-                            e.target.value
-                          )
-                        }
-                      >
-                        {statuses.map((s) => (
-                          <option key={s}>{s}</option>
-                        ))}
-                      </select>
+                {list.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="text-center">
+                      No users found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  list.map((row) => (
+                    <tr key={row.userId}>
+                      <td>{row.name}</td>
+                      <td>{row.departmentName}</td>
+                      <td>
+                        <select
+                          className="form-select"
+                          value={row.status}
+                          onChange={(e) =>
+                            handleChange(
+                              row.userId,
+                              row.departmentId,
+                              e.target.value
+                            )
+                          }
+                        >
+                          {statuses.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
