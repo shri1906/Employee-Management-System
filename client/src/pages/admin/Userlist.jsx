@@ -212,6 +212,7 @@ const Userlist = () => {
                     <th>Profile Image</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Employee ID</th>
                     <th>Role</th>
                     <th>Designation</th>
                     <th>Department</th>
@@ -236,6 +237,7 @@ const Userlist = () => {
                       </td>
                       <td>{u.name}</td>
                       <td>{u.email}</td>
+                      <td>{u.employeeId || "-"}</td>
                       <td>{u.role}</td>
                       <td>{u.designation || "-"}</td>
                       <td>{u.department?.name || "-"}</td>

@@ -1,6 +1,24 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
+// Generate Employee ID
+const generateEmployeeId = async () => {
+  const year = new Date().getFullYear();
+
+  const lastUser = await User.findOne({
+    employeeId: new RegExp(`EMP-${year}`),
+  }).sort({ createdAt: -1 });
+
+  let nextNumber = 1;
+
+  if (lastUser?.employeeId) {
+    const lastSeq = parseInt(lastUser.employeeId.split("-").pop());
+    nextNumber = lastSeq + 1;
+  }
+
+  return `EMP-${year}-${String(nextNumber).padStart(3, "0")}`;
+};
+
 
 // CREATE USER
 exports.create = async (req, res) => {
@@ -15,7 +33,10 @@ exports.create = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const employeeId = await generateEmployeeId();
+
     const user = await User.create({
+      employeeId,
       name,
       email,
       password: hashedPassword,
