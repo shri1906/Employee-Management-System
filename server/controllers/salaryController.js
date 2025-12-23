@@ -1,6 +1,9 @@
 const Salary = require("../models/Salary");
-const generateSlip = require("../utils/salarySlipPdf.js");
+const generateSlip = require("../utils/salarySlipPDF");
+const generatePdfBuffer = require("../utils/salarySlipPDFBuffer");
+const sendEmail = require("../utils/emailSalarySlip");
 
+// ================= CREATE SALARY =================
 exports.create = async (req, res) => {
   try {
     const { earnings, deductions } = req.body;
@@ -13,10 +16,7 @@ exports.create = async (req, res) => {
       earnings.specialAllowance;
 
     const totalDeductions =
-      deductions.pf +
-      deductions.esi +
-      deductions.tax +
-      deductions.other;
+      deductions.pf + deductions.esi + deductions.tax + deductions.other;
 
     const netSalary = grossSalary - totalDeductions;
 
@@ -39,6 +39,7 @@ exports.create = async (req, res) => {
   }
 };
 
+// ================= GET ALL (ADMIN) =================
 exports.getAll = async (req, res) => {
   const data = await Salary.find()
     .populate("userId", "name email employeeId")
@@ -46,6 +47,7 @@ exports.getAll = async (req, res) => {
   res.json(data);
 };
 
+// ================= GET MINE (USER) =================
 exports.getMine = async (req, res) => {
   const data = await Salary.find({ userId: req.user.id }).sort({
     year: -1,
@@ -54,14 +56,17 @@ exports.getMine = async (req, res) => {
   res.json(data);
 };
 
+// ================= DOWNLOAD SLIP =================
 exports.downloadSlip = async (req, res) => {
   const salary = await Salary.findById(req.params.id)
     .populate("userId")
     .populate("departmentId");
 
-  if (!salary) return res.status(404).json({ message: "Not found" });
+  if (!salary) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
-  // 🔐 User can only download own slip
+  // 🔐 Admin OR owner
   if (
     req.user.role !== "admin" &&
     salary.userId._id.toString() !== req.user.id
@@ -70,4 +75,40 @@ exports.downloadSlip = async (req, res) => {
   }
 
   generateSlip(res, salary, salary.userId, salary.departmentId);
+};
+
+// ================= EMAIL SLIP (ADMIN ONLY) =================
+exports.emailSalarySlip = async (req, res) => {
+  try {
+    const salary = await Salary.findById(req.params.id)
+      .populate("userId", "name email employeeId")
+      .populate("departmentId", "name");
+
+    if (!salary) {
+      return res.status(404).json({ message: "Salary record not found" });
+    }
+
+    // 🔐 Admin only
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const pdfBuffer = await generatePdfBuffer(
+      salary,
+      salary.userId,
+      salary.departmentId
+    );
+
+    await sendEmail({
+      to: salary.userId.email,
+      pdfBuffer,
+      month: salary.month,
+      year: salary.year,
+    });
+
+    res.json({ message: "Salary slip emailed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to email salary slip" });
+  }
 };
