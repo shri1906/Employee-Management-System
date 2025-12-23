@@ -239,6 +239,79 @@ export const updateLeaveStatus = async (id, status) => {
   }
 };
 
+// ADMIN : Generate salary slip
+export const generateSalary = async (data) => {
+  try {
+    const response = await api.post("/salary", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Generate salary failed"
+    );
+  }
+};
+
+// ADMIN : Get all salaries
+export const getAllSalaries = async () => {
+  try {
+    const response = await api.get("/salary");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch salaries failed"
+    );
+  }
+};
+// USER : Get my salaries
+export const getMySalaries = async () => {
+  try {
+    const response = await api.get("/salary/me");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch my salaries failed"
+    );
+  }
+};
+// Download salary slip PDF
+export const downloadSalarySlip = async (salaryId) => {
+  try {
+    const response = await api.get(`/salary/${salaryId}/slip`, {
+      responseType: "blob",
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Download salary slip failed");
+  }
+};
+
+// Email slary Slip
+
+export const emailSalarySlip = async (salaryId) => {
+  try {
+    const response = await api.post(`/salary/${salaryId}/email`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Email salary slip failed"
+    );
+  }
+};
+
+// Incremental history
+
+export const getIncrementHistory = async (userId) => {
+  try {
+    const response = await api.get(
+      `/users/${userId}/increment-history`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch increment history failed"
+    );
+  }
+};
 
 
 export default api;

@@ -1,15 +1,73 @@
 const Salary = require("../models/Salary");
+const generateSlip = require("../utils/salarySlipPdf.js");
 
 exports.create = async (req, res) => {
-  req.body.netSalary =
-    req.body.basic + req.body.hra + req.body.allowance - req.body.deduction;
-  res.json(await Salary.create(req.body));
+  try {
+    const { earnings, deductions } = req.body;
+
+    const grossSalary =
+      earnings.basic +
+      earnings.hra +
+      earnings.conveyance +
+      earnings.medical +
+      earnings.specialAllowance;
+
+    const totalDeductions =
+      deductions.pf +
+      deductions.esi +
+      deductions.tax +
+      deductions.other;
+
+    const netSalary = grossSalary - totalDeductions;
+
+    const salary = await Salary.create({
+      ...req.body,
+      grossSalary,
+      totalDeductions,
+      netSalary,
+      generatedBy: req.user.id,
+    });
+
+    res.status(201).json(salary);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "Salary already generated for this month" });
+    }
+    res.status(500).json({ message: err.message });
+  }
 };
 
 exports.getAll = async (req, res) => {
-  res.json(await Salary.find().populate("userId departmentId"));
+  const data = await Salary.find()
+    .populate("userId", "name email employeeId")
+    .populate("departmentId", "name");
+  res.json(data);
 };
 
 exports.getMine = async (req, res) => {
-  res.json(await Salary.find({ userId: req.user.id }));
+  const data = await Salary.find({ userId: req.user.id }).sort({
+    year: -1,
+    month: -1,
+  });
+  res.json(data);
+};
+
+exports.downloadSlip = async (req, res) => {
+  const salary = await Salary.findById(req.params.id)
+    .populate("userId")
+    .populate("departmentId");
+
+  if (!salary) return res.status(404).json({ message: "Not found" });
+
+  // 🔐 User can only download own slip
+  if (
+    req.user.role !== "admin" &&
+    salary.userId._id.toString() !== req.user.id
+  ) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+
+  generateSlip(res, salary, salary.userId, salary.departmentId);
 };

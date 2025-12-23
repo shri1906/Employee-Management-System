@@ -1,10 +1,13 @@
 const router = require("express").Router();
 const auth = require("../middleware/authMiddleware");
-const admin = require("../middleware/roleMiddleware")("admin");
+const role = require("../middleware/roleMiddleware");
 const ctrl = require("../controllers/salaryController");
 
-router.post("/", auth, admin, ctrl.create);
-router.get("/", auth, admin, ctrl.getAll);
+router.post("/", auth, role("admin"), ctrl.create);
+router.get("/", auth, role("admin"), ctrl.getAll);
+router.get("/:id/slip", auth, role("admin"), ctrl.downloadSlip);
+
 router.get("/me", auth, ctrl.getMine);
+router.get("/me/:id/slip", auth, ctrl.downloadSlip);
 
 module.exports = router;
