@@ -3,30 +3,89 @@ import { monthlyAttendanceReport } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { toast } from "react-toastify";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
+/* 🔑 DATE NORMALIZATION ONLY */
+const normalizeAttendanceDates = (attendanceObj = {}) => {
+  const normalized = {};
+
+  Object.keys(attendanceObj).forEach((key) => {
+    const [month, day, year] = key.split("/");
+    const newKey = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    normalized[newKey] = attendanceObj[key];
+  });
+
+  return normalized;
+};
 
 export default function MonthlyAttendanceAdmin() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [data, setData] = useState([]);
 
-const fetchReport = async () => {
-      try {
-        const res = await monthlyAttendanceReport(month, year); 
-        setData(res.data || []);
-      } catch (err) {
-        toast.error(err.message || "Failed to load monthly report");
-      } 
-    };
+  const fetchReport = async () => {
+    try {
+      const res = await monthlyAttendanceReport(month, year);
+
+      // 🔥 ONLY CHANGE IS HERE
+      const formatted = (res.data || []).map((user) => ({
+        ...user,
+        attendance: normalizeAttendanceDates(user.attendance || {}),
+      }));
+
+      setData(formatted);
+    } catch (err) {
+      toast.error(err.message || "Failed to load monthly report");
+    }
+  };
+
+  const downloadExcel = () => {
+  if (data.length === 0) {
+    toast.warning("No data to download");
+    return;
+  }
+
+  // 🔹 Header row (FIXED ORDER)
+  const header = ["Name", "Department"];
+  for (let d = 1; d <= daysInMonth; d++) {
+    header.push(d.toString());
+  }
+
+  // 🔹 Data rows
+  const rows = data.map((user) => {
+    const row = [user.name, user.department];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const day = String(d).padStart(2, "0");
+      const monthStr = String(month).padStart(2, "0");
+      const dateKey = `${year}-${monthStr}-${day}`;
+
+      row.push(user.attendance?.[dateKey] || "");
+    }
+
+    return row;
+  });
+
+  // 🔹 Create worksheet using AOA (array of arrays)
+  const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array"
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: "application/octet-stream"
+  });
+
+  saveAs(blob, `Attendance_${month}_${year}.xlsx`);
+};
 
   useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const res = await monthlyAttendanceReport(month, year); 
-        setData(res.data || []);
-      } catch (err) {
-        toast.error(err.message || "Failed to load monthly report");
-      } 
-    };
     fetchReport();
   }, [month, year]);
 
@@ -54,6 +113,7 @@ const fetchReport = async () => {
               onChange={(e) => setMonth(Number(e.target.value))}
             />
           </div>
+
           <div className="col-md-3">
             <label className="form-label">Year</label>
             <input
@@ -63,10 +123,20 @@ const fetchReport = async () => {
               onChange={(e) => setYear(Number(e.target.value))}
             />
           </div>
+
           <div className="col-md-3 align-self-end">
-            <button className="btn login-left text-white" onClick={fetchReport}>
-              Fetch Report
-            </button>
+            <div className="d-flex gap-2">
+              <button
+                className="btn login-left text-white"
+                onClick={fetchReport}
+              >
+                Fetch Report
+              </button>
+
+              <button className="btn btn-success" onClick={downloadExcel}>
+                Download Excel
+              </button>
+            </div>
           </div>
         </div>
 
@@ -77,8 +147,6 @@ const fetchReport = async () => {
               <tr>
                 <th>User</th>
                 <th>Department</th>
-
-                {/* Date columns */}
                 {[...Array(daysInMonth)].map((_, i) => (
                   <th key={i}>{i + 1}</th>
                 ))}

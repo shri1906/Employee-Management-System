@@ -9,27 +9,37 @@ export default function MonthlyAttendanceUser() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [attendance, setAttendance] = useState({});
 
- const fetchReport = async () => {
+  const normalizeAttendanceDates = (attendanceObj = {}) => {
+    const normalized = {};
+
+    Object.keys(attendanceObj).forEach((key) => {
+      // key = "12/18/2025"
+      const [month, day, year] = key.split("/");
+
+      const newKey = `${year}-${month.padStart(2, "0")}-${day.padStart(
+        2,
+        "0"
+      )}`;
+
+      normalized[newKey] = attendanceObj[key];
+    });
+
+    return normalized;
+  };
+
+  const fetchReport = async () => {
     try {
       const res = await myMonthlyAttendance(month, year);
-      setAttendance(res.attendance || {});
+      setAttendance(normalizeAttendanceDates(res?.attendance ?? {}));
     } catch (err) {
       toast.error(err.message || "Failed to fetch attendance");
     }
   };
-  
 
   useEffect(() => {
-    const fetchReport = async () => {
-    try {
-      const res = await myMonthlyAttendance(month, year);
-      setAttendance(res.attendance || {});
-    } catch (err) {
-      toast.error(err.message || "Failed to fetch attendance");
-    }
-  };
     fetchReport();
   }, [month, year]);
+  console.log(attendance);
 
   // 📅 Calendar helpers
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -73,7 +83,7 @@ export default function MonthlyAttendanceUser() {
         </div>
 
         {/* Calendar */}
-        <div className="card shadow-sm">
+        <div className="mb-4">
           <div className="card-body table-responsive">
             <table className="table table-bordered text-center">
               <thead className="table-light">
@@ -115,16 +125,12 @@ export default function MonthlyAttendanceUser() {
                             ? "bg-warning text-dark"
                             : status === "S"
                             ? "bg-info"
-                            : "bg-secondary";
+                            : "";
 
                         return (
-                          <td key={dayIndex}>
+                          <td key={dayIndex} className={`${badgeClass}`}>
                             <div>{dayNumber}</div>
-                            {status && (
-                              <span className={`badge ${badgeClass}`}>
-                                {status}
-                              </span>
-                            )}
+                            {status && <span className="badge">{status}</span>}
                           </td>
                         );
                       })}
@@ -133,6 +139,13 @@ export default function MonthlyAttendanceUser() {
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="mb-3">
+            <span className="badge bg-success me-2">P</span> Present
+            <span className="badge bg-danger ms-3 me-2">A</span> Absent
+            <span className="badge bg-warning text-dark ms-3 me-2">L</span>{" "}
+            Leave
+            <span className="badge bg-info ms-3 me-2">S</span> Sick
           </div>
         </div>
       </div>
