@@ -32,7 +32,35 @@ export const login = async (email, password) => {
     throw new Error(error.response?.data?.message || "Login failed");
   }
 };
+// Change password 
 
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await api.post("/auth/change-password", {
+      oldPassword,
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Change password failed"
+    );
+  }
+};
+
+// Reset password 
+export const resetPassword = async (token, password) => {
+  try {
+    const response = await api.post(`/auth/reset-password/${token}`, {
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Reset password failed"
+    );
+  }
+};
 // DEPARTMENT_API_FUNCTION
 
 export const createDepartment = async (name, code) => {

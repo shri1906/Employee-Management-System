@@ -26,7 +26,7 @@ const Profile = () => {
         <h4 className="mb-4 text-center">My profile</h4>
 
         <div className="row justify-content-center">
-          <div className="col-md-4 col-lg-4">
+          <div className="col-md-3 col-lg-3">
             <div className="card shadow-sm text-center">
               <div className="card-body">
 

@@ -80,7 +80,7 @@ const Sidebar = () => {
             <FaCalendarAlt />
             <span>Leaves</span>
           </Link>
-           <Link to="/admin/settings" className="sidebar-item">
+           <Link to="/user/settings" className="sidebar-item">
             <FaTools />
             <span>Settings</span>
           </Link>

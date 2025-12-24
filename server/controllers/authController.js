@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
+
 /* ================= LOGIN ================= */
 exports.login = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
@@ -20,7 +21,6 @@ exports.login = async (req, res) => {
   res.json({ user, token });
 };
 
-/* ================= CHANGE PASSWORD ================= */
 exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
@@ -35,7 +35,6 @@ exports.changePassword = async (req, res) => {
   res.json({ message: "Password changed successfully" });
 };
 
-/* ================= FORGOT PASSWORD ================= */
 exports.forgotPassword = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(404).json({ message: "User not found" });
@@ -77,7 +76,6 @@ exports.forgotPassword = async (req, res) => {
   res.json({ message: "Password reset email sent" });
 };
 
-/* ================= RESET PASSWORD ================= */
 exports.resetPassword = async (req, res) => {
   const hashedToken = crypto
     .createHash("sha256")

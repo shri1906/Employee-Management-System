@@ -32,7 +32,7 @@ export default function ForgotPassword() {
             className="card shadow-lg p-4"
             style={{ maxWidth: "400px", width: "100%" }}
           >
-            <h4 className="text-center mb-4">Reset Password</h4>
+            <h4 className="text-center mb-4">Forgot Password</h4>
 
             <form onSubmit={submit}>
               <div className="input-icon mb-3">
