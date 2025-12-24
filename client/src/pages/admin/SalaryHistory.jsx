@@ -8,13 +8,20 @@ import {
 } from "../../services/api";
 import { toast } from "react-toastify";
 
+const capitalizeFirst = (text) =>
+  text.charAt(0).toUpperCase() + text.slice(1);
+
 const SalaryHistory = () => {
   const [salaries, setSalaries] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 PAGINATION STATE
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
+
+  // Modal
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSalary, setSelectedSalary] = useState(null);
 
   const fetchSalaries = async () => {
     try {
@@ -32,7 +39,7 @@ const SalaryHistory = () => {
     fetchSalaries();
   }, []);
 
-  // 🔹 PAGINATION CALCULATION
+  // Pagination logic
   const indexOfLast = currentPage * recordsPerPage;
   const indexOfFirst = indexOfLast - recordsPerPage;
   const paginatedSalaries = salaries.slice(indexOfFirst, indexOfLast);
@@ -58,6 +65,16 @@ const SalaryHistory = () => {
     } catch {
       toast.error("Email failed");
     }
+  };
+
+  const openModal = (salary) => {
+    setSelectedSalary(salary);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedSalary(null);
   };
 
   return (
@@ -99,9 +116,16 @@ const SalaryHistory = () => {
                         <td>{s.month}</td>
                         <td>{s.year}</td>
                         <td>₹ {s.netSalary}</td>
-                        <td>
+                        <td className="d-flex gap-1">
                           <button
-                            className="btn btn-sm btn-primary me-2"
+                            className="btn btn-sm btn-info"
+                            onClick={() => openModal(s)}
+                          >
+                            View
+                          </button>
+
+                          <button
+                            className="btn btn-sm btn-primary"
                             onClick={() => downloadSlip(s._id)}
                           >
                             Download
@@ -121,7 +145,7 @@ const SalaryHistory = () => {
               </table>
             </div>
 
-            {/* 🔹 PAGINATION CONTROLS */}
+            {/* Pagination */}
             {totalPages > 1 && (
               <nav className="d-flex justify-content-center mt-3">
                 <ul className="pagination">
@@ -168,6 +192,72 @@ const SalaryHistory = () => {
           </>
         )}
       </div>
+      {showModal && selectedSalary && (
+        <>
+          <div className="modal fade show d-block">
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Salary Details</h5>
+                  <button className="btn-close" onClick={closeModal}></button>
+                </div>
+                <div className="modal-body">
+                  <p><strong>Employee:</strong> {selectedSalary.userId?.name}</p>
+                  <p><strong>Employee ID:</strong> {selectedSalary.userId?.employeeId}</p>
+                  <p><strong>Department:</strong> {selectedSalary.departmentId?.name}</p>
+                  <p><strong>Month / Year:</strong> {selectedSalary.month}/{selectedSalary.year}</p>
+                  <hr />
+                  <div className="row">
+                    <div className="col-md-6">
+                      <h6>Earnings</h6>
+                      <ul className="list-group">
+                        {Object.entries(selectedSalary.earnings).map(
+                          ([key, val]) => (
+                            <li
+                              key={key}
+                              className="list-group-item d-flex justify-content-between"
+                            >
+                              <span>{capitalizeFirst(key)}</span>
+                              <span>₹ {val}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                    <div className="col-md-6">
+                      <h6>Deductions</h6>
+                      <ul className="list-group">
+                        {Object.entries(selectedSalary.deductions).map(
+                          ([key, val]) => (
+                            <li
+                              key={key}
+                              className="list-group-item d-flex justify-content-between"
+                            >
+                              <span>{capitalizeFirst(key)}</span>
+                              <span>₹ {val}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                  <hr />
+                  <p><strong>Gross Salary:</strong> ₹ {selectedSalary.grossSalary}</p>
+                  <p><strong>Total Deductions:</strong> ₹ {selectedSalary.totalDeductions}</p>
+                  <h5><strong>Net Salary:</strong> ₹ {selectedSalary.netSalary}</h5>
+                </div>
+
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={closeModal}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
+      )}
     </>
   );
 };

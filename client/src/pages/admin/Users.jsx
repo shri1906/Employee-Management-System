@@ -92,7 +92,7 @@ const Users = () => {
         <div className="mb-4">
           <span className="dashboard-accent"></span>
           <div>
-            <h4>Create User</h4>
+            <h4>User Management</h4>
             <small className="text-muted">Add a new system user</small>
           </div>
         </div>

@@ -40,7 +40,6 @@ const Salary = () => {
     },
   });
 
-  // ================= FETCH DATA =================
   useEffect(() => {
     getUsers().then(setUsers);
     getDepartments().then(setDepartments);
@@ -56,7 +55,6 @@ const Salary = () => {
     }
   };
 
-  // ================= HANDLERS =================
   const handleEarningChange = (key, value) => {
     setForm((prev) => ({
       ...prev,
@@ -102,17 +100,18 @@ const Salary = () => {
     toast.success("Salary slip emailed");
   };
 
-  // ================= UI =================
   return (
     <>
       <Navbar />
-    
         <Sidebar />
-
         <div className="main-content">
-          <h4 className="mb-4">Salary Management</h4>
-
-          {/* ================= GENERATE SALARY ================= */}
+        <div className="mb-4">
+          <span className="dashboard-accent"></span>
+          <div>
+            <h4>Salary Management</h4>
+            <small className="text-muted">Add salary</small>
+          </div>
+        </div>
           <div className="card mb-4">
             <div className="card-header fw-bold">Generate Salary</div>
             <div className="card-body row g-3">

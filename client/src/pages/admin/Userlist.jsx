@@ -203,11 +203,11 @@ const Userlist = () => {
           </div>
         </div>
 
-        <div className="card shadow-sm">
-          <div className="card-body">
+        <div>
+        
             <div className="table-responsive">
-              <table className="table table-hover align-middle">
-                <thead>
+              <table className="table table-bordered table-striped align-middle">
+                <thead className="table-dark">
                   <tr>
                     <th>Profile Image</th>
                     <th>Name</th>
@@ -313,7 +313,6 @@ const Userlist = () => {
                 </button>
               </div>
             )}
-          </div>
         </div>
 
         {editingUser && (

@@ -298,20 +298,5 @@ export const emailSalarySlip = async (salaryId) => {
   }
 };
 
-// Incremental history
-
-export const getIncrementHistory = async (userId) => {
-  try {
-    const response = await api.get(
-      `/users/${userId}/increment-history`
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Fetch increment history failed"
-    );
-  }
-};
-
 
 export default api;

@@ -12,7 +12,7 @@ import {
   deleteDepartment,
 } from "../../services/api";
 
-const ITEMS_PER_PAGE = 5; 
+const ITEMS_PER_PAGE = 5;
 
 const Departments = () => {
   const [departments, setDepartments] = useState([]);
@@ -29,7 +29,7 @@ const Departments = () => {
     try {
       const data = await getDepartments();
       setDepartments(data);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     } catch (err) {
       toast.error(err.message);
     }
@@ -100,149 +100,130 @@ const Departments = () => {
       <Sidebar />
 
       <div className="main-content">
-        <div className="mb-4">
+        <div className="">
           <h4>Departments</h4>
           <small className="text-muted">
             Create, update & manage departments
           </small>
         </div>
+        <div className="mb-4">Total Departments: {departments.length}</div>
+        <div className="mb-4">
+          <h6 className="mb-3">
+            {editingId ? "Update Department" : "Create Department"}
+          </h6>
 
-        <div className="row mb-4">
-          <div className="col-md-3 col-sm-6">
-            <div className="card stat-card shadow-sm">
-              <div className="card-body">
-                <h6 className="text-muted">Total Departments</h6>
-                <h3 className="fw-bold mb-0">{departments.length}</h3>
-              </div>
+          <form className="row g-3" onSubmit={submit}>
+            <div className="col-md-4 input-icon">
+              <FaBuilding className="mx-2" />
+              <input
+                className="form-control"
+                placeholder="Department Name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
-          </div>
+
+            <div className="col-md-4 input-icon">
+              <FaBarcode className="mx-2" />
+              <input
+                className="form-control"
+                placeholder="Department Code"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </div>
+
+            <div className="col-md-2">
+              <button
+                type="submit"
+                className="btn login-left text-white w-100"
+                disabled={loading}
+              >
+                {loading ? "Saving..." : editingId ? "Update" : "Add"}
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div className="card mb-4 shadow-sm">
-          <div className="card-body">
-            <h6 className="mb-3">
-              {editingId ? "Update Department" : "Create Department"}
-            </h6>
+        <div className="table-responsive">
+          <div>
+            <table className="table table-bordered table-striped align-middle text-nowrap">
+              <thead className="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Status</th>
+                  <th width="140">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedDepartments.map((d) => (
+                  <tr key={d._id}>
+                    <td>{d.name}</td>
+                    <td>{d.code}</td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          d.isActive ? "bg-success" : "bg-secondary"
+                        }`}
+                      >
+                        {d.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex flex-column flex-md-row gap-2">
+                        <button
+                          className="btn btn-sm btn-outline-primary w-100 w-md-auto"
+                          onClick={() => edit(d)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger w-100 w-md-auto"
+                          onClick={() => remove(d._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
 
-            <form className="row g-3" onSubmit={submit}>
-              <div className="col-md-4 input-icon">
-                <FaBuilding className="mx-2" />
-                <input
-                  className="form-control"
-                  placeholder="Department Name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
+                {paginatedDepartments.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="text-center text-muted">
+                      No departments found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
 
-              <div className="col-md-4 input-icon">
-                <FaBarcode className="mx-2" />
-                <input
-                  className="form-control"
-                  placeholder="Department Code"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                />
-              </div>
-
-              <div className="col-md-2">
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-end align-items-center gap-2 mt-3">
                 <button
-                  type="submit"
-                  className="btn login-left text-white w-100"
-                  disabled={loading}
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
                 >
-                  {loading
-                    ? "Saving..."
-                    : editingId
-                    ? "Update"
-                    : "Add"}
+                  Prev
+                </button>
+
+                <span className="text-muted">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                >
+                  Next
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-
-        <div className="card shadow-sm">
-          <div className="table-responsive">
-            <div className="card-body">
-              <table className="table table-hover align-middle text-nowrap">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Status</th>
-                    <th width="140">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedDepartments.map((d) => (
-                    <tr key={d._id}>
-                      <td>{d.name}</td>
-                      <td>{d.code}</td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            d.isActive ? "bg-success" : "bg-secondary"
-                          }`}
-                        >
-                          {d.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="d-flex flex-column flex-md-row gap-2">
-                          <button
-                            className="btn btn-sm btn-outline-primary w-100 w-md-auto"
-                            onClick={() => edit(d)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-danger w-100 w-md-auto"
-                            onClick={() => remove(d._id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-
-                  {paginatedDepartments.length === 0 && (
-                    <tr>
-                      <td colSpan="4" className="text-center text-muted">
-                        No departments found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-end align-items-center gap-2 mt-3">
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                  >
-                    Prev
-                  </button>
-
-                  <span className="text-muted">
-                    Page {currentPage} of {totalPages}
-                  </span>
-
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>

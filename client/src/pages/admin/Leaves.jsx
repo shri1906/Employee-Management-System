@@ -36,16 +36,21 @@ const Leaves = () => {
       <Navbar />
       <Sidebar />
       <div className="main-content">
-        <div className="card shadow-sm">
-          <div className="card-header bg-secondary text-white">
-            Leave Requests
+        <div className="mb-4">
+          <span className="dashboard-accent"></span>
+          <div>
+            <h4>Leave Management</h4>
+            <small className="text-muted">View and manage leaves</small>
           </div>
-          <div className="card-body table-responsive">
-            <table className="table table-hover table-bordered">
-              <thead>
+        </div>
+
+          
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped table-bordered">
+              <thead className="table-dark">
                 <tr>
                   <th>User</th>
-                  <th>Type</th>
+                  <th>Leave Type</th>
                   <th>Duration</th>
                   <th>Reason</th>
                   <th>Status</th>
@@ -83,7 +88,7 @@ const Leaves = () => {
             </table>
           </div>
         </div>
-      </div>
+
     </>
   );
 };
