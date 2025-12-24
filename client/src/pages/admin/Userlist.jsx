@@ -228,7 +228,7 @@ const Userlist = () => {
                     >
                       <td>
                         <img
-                          src={`http://localhost:5000${u.profileImage}`}
+                          src={`${import.meta.env.VITE_LOCALHOST}${u.profileImage}`}
                           alt="Profile"
                           className="rounded-circle"
                           width="40"
