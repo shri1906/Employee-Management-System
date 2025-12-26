@@ -20,7 +20,7 @@ const Sidebar = () => {
     <div className="sidebar">
       {user?.role === "admin" && (
         <>
-          <Link to="/admin" className="sidebar-item">
+          <Link to="/admin/dashboard" className="sidebar-item">
             <FaTachometerAlt />
             <span>Dashboard</span>
           </Link>
@@ -57,7 +57,7 @@ const Sidebar = () => {
 
       {user?.role === "user" && (
         <>
-          <Link to="/user" className="sidebar-item">
+          <Link to="/user/dashboard" className="sidebar-item">
             <FaTachometerAlt />
             <span>Dashboard</span>
           </Link>

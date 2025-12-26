@@ -248,7 +248,7 @@ const Salary = () => {
                     <button
                       className="btn btn-sm btn-success"
                       data-bs-toggle="tooltip"
-                      title="Email"
+                      title="Send Email"
                       onClick={() => emailSlip(s._id)}
                     >
                       <MdMarkEmailRead />

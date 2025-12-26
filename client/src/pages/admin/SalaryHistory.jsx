@@ -139,7 +139,7 @@ const SalaryHistory = () => {
                           <button
                             className="btn btn-sm btn-success"
                             data-bs-toggle="tooltip"
-                            title="Email"
+                            title="Send Email"
                             onClick={() => sendEmail(s._id)}
                           >
                             <MdMarkEmailRead />

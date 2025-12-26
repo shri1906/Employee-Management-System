@@ -18,7 +18,7 @@ const Login = () => {
     try {
       const { user, token } = await apiLogin(email, password);
       login(user, token);
-      window.location.href = user.role === "admin" ? "/admin" : "/user";
+      window.location.href = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Login failed");
     } finally {

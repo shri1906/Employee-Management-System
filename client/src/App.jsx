@@ -27,6 +27,7 @@ import MonthlyAttendanceUser from "./pages/user/MonthlyAttendanceUSer";
 import SalaryHistory from "./pages/admin/SalaryHistory";
 import ChangePassword from "./pages/auth/ChangePassword";
 import Register from "./pages/auth/Register";
+import NotFound from "./pages/auth/NotFound";
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
 
         {/* ===== ADMIN ROUTES ===== */}
         <Route
-          path="/admin"
+          path="/admin/dashboard"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
@@ -122,7 +123,7 @@ function App() {
 
         {/* ===== USER ROUTES ===== */}
         <Route
-          path="/user"
+          path="/user/dashboard"
           element={
             <ProtectedRoute role="user">
               <UserDashboard />
@@ -179,8 +180,8 @@ function App() {
         />
 
         {/* ===== DEFAULT / FALLBACK ===== */}
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="/" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <ToastContainer
         position="top-right"

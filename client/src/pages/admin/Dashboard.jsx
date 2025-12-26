@@ -116,19 +116,19 @@ const AdminDashboard = () => {
         {/* QUICK ACTIONS */}
         <div className="row mt-4 g-2">
           <div className="col-12 col-md-auto">
-            <Link className="btn btn-primary w-100 ">
+            <Link to="/admin/users" className="btn btn-primary w-100 ">
               <FaPlus className="text-white me-1 ic-align" />
               <span>Add User</span>
             </Link>
           </div>
           <div className="col-12 col-md-auto">
-            <Link className="btn btn-warning w-100">
+            <Link to="/admin/attendance" className="btn btn-warning w-100">
               <FaCalendarAlt className="text-dark me-1 ic-align" />
               <span>Mark Attendance</span>
             </Link>
           </div>
           <div className="col-12 col-md-auto">
-            <Link className="btn btn-success w-100">
+            <Link to="/admin/salary" className="btn btn-success w-100">
               <FaMoneyBillWave className="text-white me-1 ic-align" />
               <span>Generate Salary</span>
             </Link>

@@ -385,4 +385,14 @@ export const getAdminDashboardStats = async () => {
 };
 
 
+export const getUserDashboardStats = async () => {
+  try {
+    const res = await api.get("/dashboard/user");
+    return res.data.data;
+  } catch {
+    throw new Error("Failed to load dashboard");
+  }
+};
+
+
 export default api;

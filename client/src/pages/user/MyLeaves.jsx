@@ -79,7 +79,7 @@ const MyLeaves = () => {
 
         {/* APPLY LEAVE */}
         <div className="card shadow-sm mb-4">
-          <div className="card-header bg-secondary text-white">
+          <div className="card-header bg-dark text-white">
             Apply Leave
           </div>
 
@@ -138,7 +138,7 @@ const MyLeaves = () => {
 
             <div className="col-12 text-end">
               <button
-                className="btn btn-primary"
+                className="btn login-left text-white"
                 disabled={loading}
               >
                 {loading ? "Applying..." : "Apply Leave"}
@@ -149,7 +149,7 @@ const MyLeaves = () => {
 
         {/* MY LEAVES */}
         <div className="card shadow-sm">
-          <div className="card-header bg-secondary text-white">
+          <div className="card-header bg-dark text-white">
             My Leave History
           </div>
 
