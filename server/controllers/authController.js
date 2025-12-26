@@ -11,15 +11,19 @@ exports.login = async (req, res) => {
   if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
-
+  if (!user.isActive) {
+    return res.status(403).json({
+      message: "Your account is not approved yet. Please wait for admin approval."
+    });
+  }
   const token = jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
-
   res.json({ user, token });
 };
+
 
 exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;

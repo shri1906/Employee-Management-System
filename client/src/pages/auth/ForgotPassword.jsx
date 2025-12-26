@@ -16,7 +16,6 @@ export default function ForgotPassword() {
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
-        {/* LEFT BACKGROUND */}
         <div className="col-md-6 d-none d-md-flex align-items-center justify-content-center login-left">
           <div className="text-white text-center px-4">
             <h1 className="fw-bold">Forgot Password?</h1>
@@ -26,7 +25,6 @@ export default function ForgotPassword() {
           </div>
         </div>
 
-        {/* RIGHT FORM */}
         <div className="col-md-6 d-flex align-items-center justify-content-center">
           <div
             className="card shadow-lg p-4"

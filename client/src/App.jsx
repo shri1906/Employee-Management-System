@@ -26,6 +26,7 @@ import MonthlyAttendanceAdmin from "./pages/admin/MonthlyAttendanceAdmin";
 import MonthlyAttendanceUser from "./pages/user/MonthlyAttendanceUSer";
 import SalaryHistory from "./pages/admin/SalaryHistory";
 import ChangePassword from "./pages/auth/ChangePassword";
+import Register from "./pages/auth/Register";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+         <Route path="/user/register" element={<Register />} />
 
         {/* ===== ADMIN ROUTES ===== */}
         <Route

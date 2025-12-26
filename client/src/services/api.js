@@ -85,6 +85,17 @@ export const getDepartments = async () => {
   }
 };
 
+export const getDepartmentsRegister = async () => {
+  try {
+    const response = await api.get("/departments/public");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Fetch departments failed"
+    );
+  }
+};
+
 export const updateDepartment = async (id, name, code) => {
   try {
     const formData = new FormData();
@@ -106,6 +117,41 @@ export const deleteDepartment = async (id) => {
   }
 };
 
+// USER REGISTRATION
+export const registerUser = async (formData) => {
+  try {
+    const res = await api.post("/users/register", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Registration failed"
+    );
+  }
+};
+
+export const getPendingUsers = async () => {
+  try {
+    const res = await api.get("/users/pending");
+    return res.data;
+  } catch (err) {
+    throw new Error(err.response?.data?.message || "Failed to fetch pending users");
+  }
+};
+
+export const approveUser = async (id) => {
+  const res = await api.put(`/users/${id}/approve`);
+  return res.data;
+};
+
+export const rejectUser = async (id) => {
+  const res = await api.delete(`/users/${id}/reject`);
+  return res.data;
+};
+
+
+// Create user from admin side
 export const createUser = async (userData) => {
   try {
      const response = await api.post("/users", userData, {

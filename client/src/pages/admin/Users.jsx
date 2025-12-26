@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-
+import ConfirmModal from "../../utils/ConfirmModal";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 
@@ -14,16 +14,27 @@ import {
   FaIdBadge,
   FaPhone,
   FaList,
+  FaCheck,
+  FaTimes,
 } from "react-icons/fa";
 
-import { createUser, getDepartments } from "../../services/api";
+import {
+  createUser,
+  getDepartments,
+  getPendingUsers,
+  approveUser,
+  rejectUser,
+} from "../../services/api";
 
 const Users = () => {
   const [departments, setDepartments] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
-  // const [preview, setPreview] = useState(null);
   const fileInputRef = useRef();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmText, setConfirmText] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -39,7 +50,18 @@ const Users = () => {
     getDepartments()
       .then(setDepartments)
       .catch((err) => toast.error(err.message));
+
+    fetchPendingUsers();
   }, []);
+
+  const fetchPendingUsers = async () => {
+    try {
+      const res = await getPendingUsers();
+      setPendingUsers(res);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -47,17 +69,13 @@ const Users = () => {
 
     try {
       const formData = new FormData();
-
-      Object.keys(form).forEach((key) => {
-        formData.append(key, form[key]);
-      });
+      Object.keys(form).forEach((key) => formData.append(key, form[key]));
 
       if (profileImage) {
         formData.append("profileImage", profileImage);
       }
 
       await createUser(formData);
-
       toast.success("User created successfully");
 
       setForm({
@@ -71,15 +89,46 @@ const Users = () => {
       });
 
       setProfileImage(null);
-      // setPreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
       toast.error(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const openApproveModal = (id) => {
+    setConfirmText("Approve this user and assign an employee ID?");
+    setConfirmAction(() => async () => {
+      try {
+        await approveUser(id);
+        toast.success("User approved successfully");
+        fetchPendingUsers();
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setShowConfirm(false);
+      }
+    });
+    setShowConfirm(true);
+  };
+
+  const openRejectModal = (id) => {
+    setConfirmText(
+      "Reject this registration request? This action cannot be undone."
+    );
+    setConfirmAction(() => async () => {
+      try {
+        await rejectUser(id);
+        toast.success("User rejected");
+        fetchPendingUsers();
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setShowConfirm(false);
+      }
+    });
+    setShowConfirm(true);
   };
 
   return (
@@ -88,13 +137,11 @@ const Users = () => {
       <Sidebar />
 
       <div className="main-content">
-        {/* HEADER */}
         <div className="mb-4">
-          <span className="dashboard-accent"></span>
-          <div>
-            <h4>User Management</h4>
-            <small className="text-muted">Add a new system user</small>
-          </div>
+          <h4>User Management</h4>
+          <small className="text-muted">
+            Create users or approve pending registrations
+          </small>
         </div>
 
         <div className="row mb-4 justify-content-end">
@@ -109,16 +156,16 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="card shadow-sm">
+        <div className="card shadow-sm mb-5">
           <div className="card-body">
-            <h6 className="mb-3">User Details</h6>
+            <h6 className="mb-3">Create User (Admin)</h6>
 
             <form className="row g-3" onSubmit={submit}>
               <div className="col-md-6 input-icon">
-                <FaUser className="mx-2" />
+                <FaUser />
                 <input
                   className="form-control"
-                  placeholder="Full Name"
+                  placeholder="Full name"
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -126,7 +173,7 @@ const Users = () => {
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaEnvelope className="mx-2" />
+                <FaEnvelope />
                 <input
                   className="form-control"
                   type="email"
@@ -138,7 +185,7 @@ const Users = () => {
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaLock className="mx-2" />
+                <FaLock />
                 <input
                   className="form-control"
                   type="password"
@@ -152,7 +199,7 @@ const Users = () => {
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaUserShield className="mx-1" />
+                <FaUserShield />
                 <select
                   className="form-control px-4"
                   value={form.role}
@@ -164,7 +211,7 @@ const Users = () => {
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaBuilding className="mx-1" />
+                <FaBuilding />
                 <select
                   className="form-control px-4"
                   value={form.department}
@@ -172,7 +219,7 @@ const Users = () => {
                     setForm({ ...form, department: e.target.value })
                   }
                 >
-                  <option value="">Select Department</option>
+                  <option value="">Select department</option>
                   {departments.map((d) => (
                     <option key={d._id} value={d._id}>
                       {d.name}
@@ -182,19 +229,22 @@ const Users = () => {
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaIdBadge className="mx-2" />
+                <FaIdBadge />
                 <input
-                  className="form-control"
+                  className="form-control px-4"
                   placeholder="Designation"
                   value={form.designation}
                   onChange={(e) =>
-                    setForm({ ...form, designation: e.target.value })
+                    setForm({
+                      ...form,
+                      designation: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div className="col-md-6 input-icon">
-                <FaPhone className="mx-2" />
+                <FaPhone />
                 <input
                   className="form-control"
                   placeholder="Phone"
@@ -202,44 +252,99 @@ const Users = () => {
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
               </div>
-              <div className="col-md-6 ">
+
+              <div className="col-md-6">
                 <input
                   type="file"
-                  accept="image/*"
                   className="form-control"
                   ref={fileInputRef}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    setProfileImage(file);
-                    // setPreview(URL.createObjectURL(file));
-                  }}
+                  accept="image/*"
+                  onChange={(e) => setProfileImage(e.target.files[0])}
                 />
               </div>
-              {/* {preview && (
-                <div className="mt-2 d-flex justify-content-center">
-                  <img
-                    src={preview}
-                    alt="preview"
-                    className="rounded"
-                    width="100"
-                    height="100"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )} */}
 
               <div className="col-12">
                 <button
-                  className="btn login-left text-white w-40"
+                  className="btn login-left text-white"
                   disabled={loading}
                 >
-                  {loading ? "Creating..." : "Create User"}
+                  {loading ? "Creating..." : "Create user"}
                 </button>
               </div>
             </form>
           </div>
         </div>
+
+        {pendingUsers.length > 0 && (
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h6 className="mb-3">Pending registration requests</h6>
+
+              <div className="table-responsive">
+                <table className="table table-bordered align-middle">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Photo</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Department</th>
+                      <th>Applied on</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingUsers.map((u) => (
+                      <tr key={u._id}>
+                        <td>
+                          <img
+                            src={
+                              u.profileImage
+                                ? `${import.meta.env.VITE_LOCALHOST}${
+                                    u.profileImage
+                                  }`
+                                : "https://via.placeholder.com/40"
+                            }
+                            alt="profile"
+                            width="40"
+                            height="40"
+                            className="rounded-circle"
+                          />
+                        </td>
+                        <td>{u.name}</td>
+                        <td>{u.email}</td>
+                        <td>{u.department?.name || "—"}</td>
+                        <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            className="btn btn-success btn-sm me-2"
+                            onClick={() => openApproveModal(u._id)}
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => openRejectModal(u._id)}
+                          >
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+      <ConfirmModal
+        show={showConfirm}
+        title="Confirmation required"
+        message={confirmText}
+        onConfirm={confirmAction}
+        onCancel={() => setShowConfirm(false)}
+      />
     </>
   );
 };

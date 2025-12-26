@@ -18,14 +18,9 @@ const Login = () => {
     try {
       const { user, token } = await apiLogin(email, password);
       login(user, token);
-      window.location.href =
-        user.role === "admin" ? "/admin" : "/user";
+      window.location.href = user.role === "admin" ? "/admin" : "/user";
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        err.message ||
-        "Login failed"
-      );
+      toast.error(err.response?.data?.message || err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -34,7 +29,6 @@ const Login = () => {
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
-
         {/* LEFT */}
         <div className="login-left col-md-6 d-none d-md-flex align-items-center justify-content-center text-white">
           <div className="text-center px-4">
@@ -48,12 +42,8 @@ const Login = () => {
         {/* RIGHT */}
         <div className="col-md-6 d-flex align-items-center justify-content-center">
           <div className="card shadow-lg p-4" style={{ maxWidth: 350 }}>
-            <h4 className="text-center fw-bold">
-              Employee Management System
-            </h4>
-            <p className="text-center text-muted mb-4">
-              Sign in to continue
-            </p>
+            <h4 className="text-center fw-bold">Employee Management System</h4>
+            <p className="text-center text-muted mb-4">Sign in to continue</p>
 
             <form onSubmit={handleSubmit}>
               <div className="input-icon mb-3">
@@ -80,10 +70,14 @@ const Login = () => {
                 />
               </div>
 
-              <div className="text-end mb-3">
-                <Link to="/forgot-password">Forgot password?</Link>
+              <div className="d-flex justify-content-between mb-3">
+                <Link to="/user/register" className="text-decoration-none">
+                  Register now!
+                </Link>
+                <Link to="/forgot-password" className="text-decoration-none">
+                  Forgot password?
+                </Link>
               </div>
-
               <button
                 type="submit"
                 className="btn login-left text-white w-100"
@@ -94,7 +88,6 @@ const Login = () => {
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );
