@@ -48,9 +48,9 @@ const ChangePassword = () => {
       {/* MAIN CONTENT */}
       <div className="main-content d-flex justify-content-center align-items-center" style={{ minHeight: "calc(100vh - 64px)" }}>
         <div className="col-md-3 col-lg-3">
-             <h4 className="text-center mb-4">Change password</h4>
           <div className="card shadow-sm">
             <div className="card-body">
+               <h4 className="text-center mb-4">Change password</h4>
               <form onSubmit={handleSubmit}>
                 <div className="mb-1">
                   <label className="form-label">Old password</label>

@@ -5,14 +5,17 @@ const User = require("../models/User.js");
 
 exports.getTodayAttendance = async (req, res) => {
   try {
-   
-    const today = new Date(new Date().toLocaleDateString("en-US", { timeZone: "+05:30" }));
+    const today = new Date(
+      new Date().toLocaleDateString("en-US", { timeZone: "+05:30" })
+    );
+
     const users = await User.find({ role: "user" })
       .populate("department", "name")
       .select("_id name department");
 
     const attendance = await Attendance.find({ date: today });
     const attendanceMap = {};
+
     attendance.forEach((a) => {
       attendanceMap[a.userId.toString()] = a;
     });
@@ -25,21 +28,27 @@ exports.getTodayAttendance = async (req, res) => {
         name: user.name,
         departmentId: user.department?._id || null,
         departmentName: user.department?.name || "-",
-        status: record ? record.status : "Absent", 
+
+        // 👇 STATUS FOR DISPLAY
+        status: record ? record.status : "Absent",
+
+        // 👇 IMPORTANT FLAG
+        marked: !!record,
       };
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       attendance: result,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
+
 
 
 // ADMIN: Mark / Update attendance for today
@@ -48,7 +57,9 @@ exports.markAttendance = async (req, res) => {
   try {
     const { userId, departmentId, status } = req.body;
 
-    const today = new Date(new Date().toLocaleDateString("en-US", { timeZone: "+05:30" }));
+    const today = new Date(
+      new Date().toLocaleDateString("en-US", { timeZone: "+05:30" })
+    );
 
     const attendance = await Attendance.findOneAndUpdate(
       { userId, date: today },
@@ -62,15 +73,19 @@ exports.markAttendance = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Attendance marked successfully",
       attendance,
     });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 //  ADMIN: Attendance report (date-wise)
 
