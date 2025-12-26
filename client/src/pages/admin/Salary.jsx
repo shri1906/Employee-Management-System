@@ -11,6 +11,8 @@ import {
   emailSalarySlip,
 } from "../../services/api";
 import { toast } from "react-toastify";
+import { FaFileDownload } from "react-icons/fa";
+import { MdMarkEmailRead } from "react-icons/md";
 
 const Salary = () => {
   const navigate = useNavigate();
@@ -103,8 +105,8 @@ const Salary = () => {
   return (
     <>
       <Navbar />
-        <Sidebar />
-        <div className="main-content">
+      <Sidebar />
+      <div className="main-content">
         <div className="mb-4">
           <span className="dashboard-accent"></span>
           <div>
@@ -112,155 +114,152 @@ const Salary = () => {
             <small className="text-muted">Add salary</small>
           </div>
         </div>
-          <div className="card mb-4">
-            <div className="card-header fw-bold">Generate Salary</div>
-            <div className="card-body row g-3">
+        <div className="card mb-4">
+          <div className="card-header fw-bold">Generate Salary</div>
+          <div className="card-body row g-3">
+            <div className="col-md-3">
+              <label>User</label>
+              <select
+                className="form-select"
+                onChange={(e) => setForm({ ...form, userId: e.target.value })}
+              >
+                <option value="">Select User</option>
+                {users.map((u) => (
+                  <option key={u._id} value={u._id}>
+                    {u.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="col-md-3">
-                <label>User</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setForm({ ...form, userId: e.target.value })
-                  }
-                >
-                  <option value="">Select User</option>
-                  {users.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="col-md-3">
+              <label>Department</label>
+              <select
+                className="form-select"
+                onChange={(e) =>
+                  setForm({ ...form, departmentId: e.target.value })
+                }
+              >
+                <option value="">Select Department</option>
+                {departments.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="col-md-3">
-                <label>Department</label>
-                <select
-                  className="form-select"
-                  onChange={(e) =>
-                    setForm({ ...form, departmentId: e.target.value })
-                  }
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d._id} value={d._id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="col-md-2">
+              <label>Month</label>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="MM"
+                onChange={(e) => setForm({ ...form, month: e.target.value })}
+              />
+            </div>
 
-              <div className="col-md-2">
-                <label>Month</label>
+            <div className="col-md-2">
+              <label>Year</label>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="YYYY"
+                onChange={(e) => setForm({ ...form, year: e.target.value })}
+              />
+            </div>
+
+            {/* Earnings */}
+            <div className="col-12 mt-3 fw-bold">Earnings</div>
+            {Object.keys(form.earnings).map((k) => (
+              <div className="col-md-2" key={k}>
                 <input
-                  type="number"
                   className="form-control"
-                  placeholder="MM"
-                  onChange={(e) =>
-                    setForm({ ...form, month: e.target.value })
-                  }
+                  placeholder={k}
+                  onChange={(e) => handleEarningChange(k, e.target.value)}
                 />
               </div>
+            ))}
 
-              <div className="col-md-2">
-                <label>Year</label>
+            {/* Deductions */}
+            <div className="col-12 mt-3 fw-bold">Deductions</div>
+            {Object.keys(form.deductions).map((k) => (
+              <div className="col-md-2" key={k}>
                 <input
-                  type="number"
                   className="form-control"
-                  placeholder="YYYY"
-                  onChange={(e) =>
-                    setForm({ ...form, year: e.target.value })
-                  }
+                  placeholder={k}
+                  onChange={(e) => handleDeductionChange(k, e.target.value)}
                 />
               </div>
+            ))}
 
-              {/* Earnings */}
-              <div className="col-12 mt-3 fw-bold">Earnings</div>
-              {Object.keys(form.earnings).map((k) => (
-                <div className="col-md-2" key={k}>
-                  <input
-                    className="form-control"
-                    placeholder={k}
-                    onChange={(e) => handleEarningChange(k, e.target.value)}
-                  />
-                </div>
-              ))}
-
-              {/* Deductions */}
-              <div className="col-12 mt-3 fw-bold">Deductions</div>
-              {Object.keys(form.deductions).map((k) => (
-                <div className="col-md-2" key={k}>
-                  <input
-                    className="form-control"
-                    placeholder={k}
-                    onChange={(e) => handleDeductionChange(k, e.target.value)}
-                  />
-                </div>
-              ))}
-
-              <div className="col-12">
-                <button
-                  className="btn login-left text-white"
-                  onClick={submitSalary}
-                  disabled={loading}
-                >
-                  Generate Salary
-                </button>
-              </div>
+            <div className="col-12">
+              <button
+                className="btn login-left text-white"
+                onClick={submitSalary}
+                disabled={loading}
+              >
+                Generate Salary
+              </button>
             </div>
           </div>
-
-          {/* ================= SALARY HISTORY ================= */}
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <h5>Salary History</h5>
-            <button
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => navigate("/admin/salary-history")}
-            >
-              View All
-            </button>
-          </div>
-
-          <div className="table-responsive">
-            <table className="table table-bordered table-striped">
-              <thead className="table-dark">
-                <tr>
-                  <th>User</th>
-                  <th>Department</th>
-                  <th>Month</th>
-                  <th>Year</th>
-                  <th>Net Salary</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {salaries.slice(0, 5).map((s) => (
-                  <tr key={s._id}>
-                    <td>{s.userId?.name}</td>
-                    <td>{s.departmentId?.name}</td>
-                    <td>{s.month}</td>
-                    <td>{s.year}</td>
-                    <td>₹ {s.netSalary}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary me-2"
-                        onClick={() => downloadSlip(s._id)}
-                      >
-                        Download
-                      </button>
-                      <button
-                        className="btn btn-sm btn-success"
-                        onClick={() => emailSlip(s._id)}
-                      >
-                        Email
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
+
+        {/* ================= SALARY HISTORY ================= */}
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h5>Salary History</h5>
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => navigate("/admin/salary-history")}
+          >
+            View All
+          </button>
+        </div>
+
+        <div className="table-responsive">
+          <table className="table table-bordered table-striped">
+            <thead className="table-dark">
+              <tr>
+                <th>User</th>
+                <th>Department</th>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {salaries.slice(0, 5).map((s) => (
+                <tr key={s._id}>
+                  <td>{s.userId?.name}</td>
+                  <td>{s.departmentId?.name}</td>
+                  <td>{s.month}</td>
+                  <td>{s.year}</td>
+                  <td>₹ {s.netSalary}</td>
+                  <td className="d-flex">
+                    <button
+                      className="btn btn-sm btn-primary me-2"
+                      data-bs-toggle="tooltip"
+                      title="Download"
+                      onClick={() => downloadSlip(s._id)}
+                    >
+                      <FaFileDownload />
+                    </button>
+                    <button
+                      className="btn btn-sm btn-success"
+                      data-bs-toggle="tooltip"
+                      title="Email"
+                      onClick={() => emailSlip(s._id)}
+                    >
+                      <MdMarkEmailRead />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </>
   );
 };

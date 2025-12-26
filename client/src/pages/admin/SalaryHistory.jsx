@@ -7,9 +7,10 @@ import {
   emailSalarySlip,
 } from "../../services/api";
 import { toast } from "react-toastify";
+import { FaRegListAlt, FaFileDownload } from "react-icons/fa";
+import { MdMarkEmailRead } from "react-icons/md";
 
-const capitalizeFirst = (text) =>
-  text.charAt(0).toUpperCase() + text.slice(1);
+const capitalizeFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
 const SalaryHistory = () => {
   const [salaries, setSalaries] = useState([]);
@@ -119,23 +120,29 @@ const SalaryHistory = () => {
                         <td className="d-flex gap-1">
                           <button
                             className="btn btn-sm btn-info"
+                            data-bs-toggle="tooltip"
+                            title="View Details"
                             onClick={() => openModal(s)}
                           >
-                            View
+                            <FaRegListAlt />
                           </button>
 
                           <button
                             className="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Download"
                             onClick={() => downloadSlip(s._id)}
                           >
-                            Download
+                            <FaFileDownload />
                           </button>
 
                           <button
                             className="btn btn-sm btn-success"
+                            data-bs-toggle="tooltip"
+                            title="Email"
                             onClick={() => sendEmail(s._id)}
                           >
-                            Email
+                            <MdMarkEmailRead />
                           </button>
                         </td>
                       </tr>
@@ -149,7 +156,9 @@ const SalaryHistory = () => {
             {totalPages > 1 && (
               <nav className="d-flex justify-content-center mt-3">
                 <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 && "disabled"}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 && "disabled"}`}
+                  >
                     <button
                       className="page-link"
                       onClick={() => setCurrentPage((p) => p - 1)}
@@ -202,10 +211,21 @@ const SalaryHistory = () => {
                   <button className="btn-close" onClick={closeModal}></button>
                 </div>
                 <div className="modal-body">
-                  <p><strong>Employee:</strong> {selectedSalary.userId?.name}</p>
-                  <p><strong>Employee ID:</strong> {selectedSalary.userId?.employeeId}</p>
-                  <p><strong>Department:</strong> {selectedSalary.departmentId?.name}</p>
-                  <p><strong>Month / Year:</strong> {selectedSalary.month}/{selectedSalary.year}</p>
+                  <p>
+                    <strong>Employee:</strong> {selectedSalary.userId?.name}
+                  </p>
+                  <p>
+                    <strong>Employee ID:</strong>{" "}
+                    {selectedSalary.userId?.employeeId}
+                  </p>
+                  <p>
+                    <strong>Department:</strong>{" "}
+                    {selectedSalary.departmentId?.name}
+                  </p>
+                  <p>
+                    <strong>Month / Year:</strong> {selectedSalary.month}/
+                    {selectedSalary.year}
+                  </p>
                   <hr />
                   <div className="row">
                     <div className="col-md-6">
@@ -242,9 +262,17 @@ const SalaryHistory = () => {
                     </div>
                   </div>
                   <hr />
-                  <p><strong>Gross Salary:</strong> ₹ {selectedSalary.grossSalary}</p>
-                  <p><strong>Total Deductions:</strong> ₹ {selectedSalary.totalDeductions}</p>
-                  <h5><strong>Net Salary:</strong> ₹ {selectedSalary.netSalary}</h5>
+                  <p>
+                    <strong>Gross Salary:</strong> ₹{" "}
+                    {selectedSalary.grossSalary}
+                  </p>
+                  <p>
+                    <strong>Total Deductions:</strong> ₹{" "}
+                    {selectedSalary.totalDeductions}
+                  </p>
+                  <h5>
+                    <strong>Net Salary:</strong> ₹ {selectedSalary.netSalary}
+                  </h5>
                 </div>
 
                 <div className="modal-footer">

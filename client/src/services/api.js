@@ -372,5 +372,17 @@ export const emailSalarySlip = async (salaryId) => {
   }
 };
 
+//Dashboard Statics
+export const getAdminDashboardStats = async () => {
+  try {
+    const res = await api.get("/dashboard/admin");
+    return res.data.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to load dashboard stats"
+    );
+  }
+};
+
 
 export default api;

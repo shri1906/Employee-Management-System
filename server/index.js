@@ -41,6 +41,8 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/leave", leaveRoutes);
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+
 
 // ===== 404 HANDLER =====
 app.use((req, res) => {
