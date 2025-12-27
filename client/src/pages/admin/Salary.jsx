@@ -115,7 +115,7 @@ const Salary = () => {
           </div>
         </div>
         <div className="card mb-4">
-          <div className="card-header fw-bold">Generate Salary</div>
+          <div className="card-header fw-bold bg-dark text-light">Generate Salary</div>
           <div className="card-body row g-3">
             <div className="col-md-3">
               <label>User</label>

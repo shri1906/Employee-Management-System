@@ -3,10 +3,8 @@ import { monthlyAttendanceReport } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { toast } from "react-toastify";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
 
-/* 🔑 DATE NORMALIZATION ONLY */
 const normalizeAttendanceDates = (attendanceObj = {}) => {
   const normalized = {};
 
@@ -24,11 +22,12 @@ export default function MonthlyAttendanceAdmin() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [data, setData] = useState([]);
 
+  const daysInMonth = new Date(year, month, 0).getDate();
+
   const fetchReport = async () => {
     try {
       const res = await monthlyAttendanceReport(month, year);
 
-      // 🔥 ONLY CHANGE IS HERE
       const formatted = (res.data || []).map((user) => ({
         ...user,
         attendance: normalizeAttendanceDates(user.attendance || {}),
@@ -40,57 +39,78 @@ export default function MonthlyAttendanceAdmin() {
     }
   };
 
-  const downloadExcel = () => {
-  if (data.length === 0) {
-    toast.warning("No data to download");
-    return;
-  }
-
-  // 🔹 Header row (FIXED ORDER)
-  const header = ["Name", "Department"];
-  for (let d = 1; d <= daysInMonth; d++) {
-    header.push(d.toString());
-  }
-
-  // 🔹 Data rows
-  const rows = data.map((user) => {
-    const row = [user.name, user.department];
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const day = String(d).padStart(2, "0");
-      const monthStr = String(month).padStart(2, "0");
-      const dateKey = `${year}-${monthStr}-${day}`;
-
-      row.push(user.attendance?.[dateKey] || "");
-    }
-
-    return row;
-  });
-
-  // 🔹 Create worksheet using AOA (array of arrays)
-  const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
-  const workbook = XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-
-  const excelBuffer = XLSX.write(workbook, {
-    bookType: "xlsx",
-    type: "array"
-  });
-
-  const blob = new Blob([excelBuffer], {
-    type: "application/octet-stream"
-  });
-
-  saveAs(blob, `Attendance_${month}_${year}.xlsx`);
-};
-
   useEffect(() => {
     fetchReport();
   }, [month, year]);
 
-  // 📅 Days in selected month
-  const daysInMonth = new Date(year, month, 0).getDate();
+  /* =========================
+     📥 DOWNLOAD EXCEL (ExcelJS)
+     ========================= */
+  const downloadExcel = async () => {
+    if (data.length === 0) {
+      toast.warning("No data to download");
+      return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Attendance");
+
+    // 🔹 Header row
+    const header = ["Name", "Department"];
+    for (let d = 1; d <= daysInMonth; d++) {
+      header.push(d.toString());
+    }
+
+    sheet.addRow(header);
+
+    // 🔹 Styling header
+    sheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    // 🔹 Data rows
+    data.forEach((user) => {
+      const row = [user.name, user.department];
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const day = String(d).padStart(2, "0");
+        const monthStr = String(month).padStart(2, "0");
+        const dateKey = `${year}-${monthStr}-${day}`;
+
+        row.push(user.attendance?.[dateKey] || "");
+      }
+
+      sheet.addRow(row);
+    });
+
+    // 🔹 Column widths
+    sheet.columns = [
+      { width: 25 },
+      { width: 20 },
+      ...Array(daysInMonth).fill({ width: 5 }),
+    ];
+
+    // 🔹 Generate & download
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Attendance_${month}_${year}.xlsx`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <>
@@ -124,7 +144,7 @@ export default function MonthlyAttendanceAdmin() {
             />
           </div>
 
-          <div className="col-md-3 align-self-end">
+          <div className="col-md-4 align-self-end">
             <div className="d-flex gap-2">
               <button
                 className="btn login-left text-white"
@@ -170,7 +190,6 @@ export default function MonthlyAttendanceAdmin() {
                       const day = String(i + 1).padStart(2, "0");
                       const monthStr = String(month).padStart(2, "0");
                       const dateKey = `${year}-${monthStr}-${day}`;
-
                       const status = user.attendance[dateKey];
 
                       const badgeClass =

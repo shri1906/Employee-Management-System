@@ -11,17 +11,21 @@ const departmentRoutes = require("./routes/departmentRoutes");
 const salaryRoutes = require("./routes/salaryRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
+const sanitize = require("./middleware/sanitize");
 dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: "*", 
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "10mb" }));
+app.use(sanitize);
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
@@ -29,7 +33,7 @@ connectDB();
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
-    message: "Employee Management System API is running"
+    message: "Employee Management System API is running",
   });
 });
 
@@ -43,12 +47,11 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
-
 // ===== 404 HANDLER =====
 app.use((req, res) => {
   res.status(404).json({
     status: "error",
-    message: "API route not found"
+    message: "API route not found",
   });
 });
 
@@ -57,7 +60,7 @@ app.use((err, req, res, next) => {
   console.error("ERROR:", err.stack);
   res.status(err.status || 500).json({
     status: "error",
-    message: err.message || "Internal Server Error"
+    message: err.message || "Internal Server Error",
   });
 });
 
