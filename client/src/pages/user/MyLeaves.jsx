@@ -3,6 +3,7 @@ import { applyLeave, myLeaves } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/sanitize";
 
 const MyLeaves = () => {
   const [leaves, setLeaves] = useState([]);
@@ -20,7 +21,7 @@ const MyLeaves = () => {
   const fetchLeaves = async () => {
     try {
       const res = await myLeaves();
-      setLeaves(res.leaves);
+      setLeaves(res.leaves || []);
     } catch (err) {
       toast.error(err.message || "Failed to load leaves");
     }
@@ -33,8 +34,7 @@ const MyLeaves = () => {
   const submit = async (e) => {
     e.preventDefault();
 
-    // 🔴 Validation
-    if (!form.startDate || !form.endDate || !form.reason) {
+    if (!form.startDate || !form.endDate || !form.reason.trim()) {
       toast.warning("Please fill all required fields");
       return;
     }
@@ -48,8 +48,11 @@ const MyLeaves = () => {
       setLoading(true);
 
       await applyLeave({
-        ...form,
-        departmentId: user.department, // ✅ auto attach
+        leaveType: form.leaveType, // enum → no sanitization
+        startDate: form.startDate,
+        endDate: form.endDate,
+        reason: sanitizeInput(form.reason),
+        departmentId: sanitizeInput(user.department),
       });
 
       toast.success("Leave applied successfully");
@@ -76,8 +79,6 @@ const MyLeaves = () => {
 
       <div className="main-content mt-4">
         <h4 className="mb-3">My Leaves</h4>
-
-        {/* APPLY LEAVE */}
         <div className="card shadow-sm mb-4">
           <div className="card-header bg-dark text-white">
             Apply Leave
@@ -131,9 +132,12 @@ const MyLeaves = () => {
                 rows="2"
                 value={form.reason}
                 onChange={(e) =>
-                  setForm({ ...form, reason: e.target.value })
+                  setForm({
+                    ...form,
+                    reason: sanitizeInput(e.target.value),
+                  })
                 }
-              ></textarea>
+              />
             </div>
 
             <div className="col-12 text-end">
@@ -146,8 +150,6 @@ const MyLeaves = () => {
             </div>
           </form>
         </div>
-
-        {/* MY LEAVES */}
         <div className="card shadow-sm">
           <div className="card-header bg-dark text-white">
             My Leave History
@@ -173,7 +175,7 @@ const MyLeaves = () => {
                 ) : (
                   leaves.map((l) => (
                     <tr key={l._id}>
-                      <td>{l.leaveType}</td>
+                      <td>{sanitizeInput(l.leaveType)}</td>
                       <td>{new Date(l.startDate).toLocaleDateString()}</td>
                       <td>{new Date(l.endDate).toLocaleDateString()}</td>
                       <td>
@@ -186,7 +188,7 @@ const MyLeaves = () => {
                               : "bg-warning text-dark"
                           }`}
                         >
-                          {l.status}
+                          {sanitizeInput(l.status)}
                         </span>
                       </td>
                     </tr>

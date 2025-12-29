@@ -3,47 +3,55 @@ import { myMonthlyAttendance } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/sanitize";
 
 export default function MonthlyAttendanceUser() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [attendance, setAttendance] = useState({});
 
+  // 🔐 Normalize backend attendance keys
   const normalizeAttendanceDates = (attendanceObj = {}) => {
     const normalized = {};
 
     Object.keys(attendanceObj).forEach((key) => {
-      // key = "12/18/2025"
-      const [month, day, year] = key.split("/");
+      const cleanKey = sanitizeInput(key);
 
-      const newKey = `${year}-${month.padStart(2, "0")}-${day.padStart(
-        2,
-        "0"
-      )}`;
+      const [m, d, y] = cleanKey.split("/");
+      if (!m || !d || !y) return;
 
-      normalized[newKey] = attendanceObj[key];
+      const newKey = `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+      normalized[newKey] = sanitizeInput(attendanceObj[key]);
     });
 
     return normalized;
   };
 
-  const fetchReport = async () => {
-    try {
-      const res = await myMonthlyAttendance(month, year);
-      setAttendance(normalizeAttendanceDates(res?.attendance ?? {}));
-    } catch (err) {
-      toast.error(err.message || "Failed to fetch attendance");
-    }
-  };
-
   useEffect(() => {
+    const fetchReport = async () => {
+      const safeMonth = Number(sanitizeInput(String(month)));
+      const safeYear = Number(sanitizeInput(String(year)));
+
+      if (safeMonth < 1 || safeMonth > 12) {
+        return toast.error("Invalid month");
+      }
+
+      if (safeYear < 2000 || safeYear > 2100) {
+        return toast.error("Invalid year");
+      }
+
+      try {
+        const res = await myMonthlyAttendance(safeMonth, safeYear);
+        setAttendance(normalizeAttendanceDates(res?.attendance ?? {}));
+      } catch (err) {
+        toast.error(err.message || "Failed to fetch attendance");
+      }
+    };
     fetchReport();
   }, [month, year]);
-  console.log(attendance);
 
-  // 📅 Calendar helpers
   const daysInMonth = new Date(year, month, 0).getDate();
-  const firstDay = new Date(year, month - 1, 1).getDay(); // 0 = Sunday
+  const firstDay = new Date(year, month - 1, 1).getDay();
 
   return (
     <>
@@ -63,22 +71,18 @@ export default function MonthlyAttendanceUser() {
               max="12"
               className="form-control"
               value={month}
-              onChange={(e) => setMonth(Number(e.target.value))}
+              onChange={(e) => setMonth(Number(sanitizeInput(e.target.value)))}
             />
           </div>
+
           <div className="col-md-3">
             <label className="form-label">Year</label>
             <input
               type="number"
               className="form-control"
               value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
+              onChange={(e) => setYear(Number(sanitizeInput(e.target.value)))}
             />
-          </div>
-          <div className="col-md-3 align-self-end">
-            <button className="btn login-left text-white" onClick={fetchReport}>
-              Fetch Report
-            </button>
           </div>
         </div>
 
@@ -97,6 +101,7 @@ export default function MonthlyAttendanceUser() {
                   <th>Sat</th>
                 </tr>
               </thead>
+
               <tbody>
                 {[...Array(Math.ceil((daysInMonth + firstDay) / 7))].map(
                   (_, weekIndex) => (
@@ -128,7 +133,7 @@ export default function MonthlyAttendanceUser() {
                             : "";
 
                         return (
-                          <td key={dayIndex} className={`${badgeClass}`}>
+                          <td key={dayIndex} className={badgeClass}>
                             <div>{dayNumber}</div>
                             {status && <span className="badge">{status}</span>}
                           </td>
@@ -140,6 +145,8 @@ export default function MonthlyAttendanceUser() {
               </tbody>
             </table>
           </div>
+
+          {/* Legend */}
           <div className="mb-3">
             <span className="badge bg-success me-2">P</span> Present
             <span className="badge bg-danger ms-3 me-2">A</span> Absent

@@ -5,9 +5,9 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
 
-/* ================= LOGIN ================= */
 exports.login = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email })
+  .populate("department", "name"); ;
   if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
