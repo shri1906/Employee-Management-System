@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { resetPassword } from "../../services/api";
 import { FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -15,21 +16,24 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!password || !confirmPassword) {
+    const sanPassword = sanitizeInput(password).trim();
+    const sanConfirmPassword = sanitizeInput(confirmPassword).trim();
+
+    if (!sanPassword || !sanConfirmPassword) {
       return toast.error("All fields are required");
     }
 
-    if (password !== confirmPassword) {
+    if (sanPassword !== sanConfirmPassword) {
       return toast.error("Passwords do not match");
     }
 
-    if (password.length < 6) {
+    if (sanPassword.length < 6) {
       return toast.error("Password must be at least 6 characters");
     }
 
     try {
       setLoading(true);
-      await resetPassword(token, password);
+      await resetPassword(token, sanPassword);
       toast.success("Password reset successful");
 
       setTimeout(() => {

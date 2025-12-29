@@ -24,7 +24,9 @@ export default function MonthlyAttendanceAdmin() {
 
   const daysInMonth = new Date(year, month, 0).getDate();
 
-  const fetchReport = async () => {
+ 
+  useEffect(() => {
+     const fetchReport = async () => {
     try {
       const res = await monthlyAttendanceReport(month, year);
 
@@ -39,13 +41,9 @@ export default function MonthlyAttendanceAdmin() {
     }
   };
 
-  useEffect(() => {
     fetchReport();
   }, [month, year]);
 
-  /* =========================
-     📥 DOWNLOAD EXCEL (ExcelJS)
-     ========================= */
   const downloadExcel = async () => {
     if (data.length === 0) {
       toast.warning("No data to download");
@@ -55,7 +53,6 @@ export default function MonthlyAttendanceAdmin() {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Attendance");
 
-    // 🔹 Header row
     const header = ["Name", "Department"];
     for (let d = 1; d <= daysInMonth; d++) {
       header.push(d.toString());
@@ -63,7 +60,6 @@ export default function MonthlyAttendanceAdmin() {
 
     sheet.addRow(header);
 
-    // 🔹 Styling header
     sheet.getRow(1).eachCell((cell) => {
       cell.font = { bold: true };
       cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -75,7 +71,6 @@ export default function MonthlyAttendanceAdmin() {
       };
     });
 
-    // 🔹 Data rows
     data.forEach((user) => {
       const row = [user.name, user.department];
 
@@ -90,14 +85,12 @@ export default function MonthlyAttendanceAdmin() {
       sheet.addRow(row);
     });
 
-    // 🔹 Column widths
     sheet.columns = [
       { width: 25 },
       { width: 20 },
       ...Array(daysInMonth).fill({ width: 5 }),
     ];
 
-    // 🔹 Generate & download
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type:
@@ -146,13 +139,6 @@ export default function MonthlyAttendanceAdmin() {
 
           <div className="col-md-4 align-self-end">
             <div className="d-flex gap-2">
-              <button
-                className="btn login-left text-white"
-                onClick={fetchReport}
-              >
-                Fetch Report
-              </button>
-
               <button className="btn btn-success" onClick={downloadExcel}>
                 Download Excel
               </button>

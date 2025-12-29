@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,10 +14,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const sanitizedEmail = sanitizeInput(email).toLowerCase();
+    const sanitizedPassword = sanitizeInput(password).trim();
     setLoading(true);
 
     try {
-      const { user, token } = await apiLogin(email, password);
+      const { user, token } = await apiLogin(sanitizedEmail, sanitizedPassword);
       login(user, token);
       window.location.href = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
     } catch (err) {

@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { changePassword } from "../../services/api";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
@@ -12,22 +13,26 @@ const ChangePassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const sanOldPassword = sanitizeInput(oldPassword).trim();
+    const sanNewPassword = sanitizeInput(newPassword).trim();
+    const sanConfirmPassword = sanitizeInput(confirmPassword).trim();
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
+    if (!sanOldPassword || !sanNewPassword || !sanConfirmPassword) {
       return toast.error("All fields are required");
     }
 
-    if (newPassword !== confirmPassword) {
+    if (sanNewPassword !== sanConfirmPassword) {
       return toast.error("New passwords do not match");
     }
 
-    if (newPassword.length < 6) {
+    if (sanNewPassword.length < 6) {
       return toast.error("Password must be at least 6 characters");
     }
 
     try {
       setLoading(true);
-      await changePassword(oldPassword, newPassword);
+      await changePassword(sanOldPassword, sanNewPassword);
       toast.success("Password changed successfully");
 
       setOldPassword("");

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -46,8 +47,17 @@ const Register = () => {
       return toast.error("Required fields missing");
     }
 
+    const cleanForm = {
+      name: sanitizeInput(form.name),
+      email: sanitizeInput(form.email).toLowerCase(),
+      password: form.password.trim(),
+      phone: sanitizeInput(form.phone),
+      department: form.department,
+      designation: sanitizeInput(form.designation),
+    };
+
     const formData = new FormData();
-    Object.keys(form).forEach((k) => formData.append(k, form[k]));
+    Object.keys(cleanForm).forEach((k) => formData.append(k, form[k]));
     if (profileImage) formData.append("profileImage", profileImage);
 
     try {

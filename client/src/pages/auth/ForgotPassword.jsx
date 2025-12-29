@@ -3,13 +3,15 @@ import api from "../../services/api";
 import { Link } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
-    await api.post("/auth/forgot-password", { email });
+    const sanitizedEmail = sanitizeInput(email).toLowerCase();
+    await api.post("/auth/forgot-password", { sanitizedEmail});
     toast.success("Reset link sent to your email");
   };
 
