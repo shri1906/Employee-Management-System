@@ -13,6 +13,7 @@ import {
 import { toast } from "react-toastify";
 import { FaFileDownload } from "react-icons/fa";
 import { MdMarkEmailRead } from "react-icons/md";
+import { sanitizeInput } from "../../utils/sanitize";
 
 const Salary = () => {
   const navigate = useNavigate();
@@ -57,37 +58,64 @@ const Salary = () => {
     }
   };
 
+  /* ================= SAFE NUMBER HANDLER ================= */
+  const safeNumber = (value) => Math.max(0, Number(value) || 0);
+
   const handleEarningChange = (key, value) => {
     setForm((prev) => ({
       ...prev,
-      earnings: { ...prev.earnings, [key]: Number(value) },
+      earnings: {
+        ...prev.earnings,
+        [key]: safeNumber(value),
+      },
     }));
   };
 
   const handleDeductionChange = (key, value) => {
     setForm((prev) => ({
       ...prev,
-      deductions: { ...prev.deductions, [key]: Number(value) },
+      deductions: {
+        ...prev.deductions,
+        [key]: safeNumber(value),
+      },
     }));
   };
 
+  /* ================= SUBMIT SALARY ================= */
   const submitSalary = async () => {
-    if (!form.userId || !form.departmentId || !form.month || !form.year) {
-      return toast.error("All fields are required");
+    const payload = {
+      ...form,
+      userId: sanitizeInput(form.userId),
+      departmentId: sanitizeInput(form.departmentId),
+      month: Number(form.month),
+      year: Number(form.year),
+    };
+
+    if (!payload.userId || !payload.departmentId) {
+      return toast.error("User and Department are required");
+    }
+
+    if (payload.month < 1 || payload.month > 12) {
+      return toast.error("Invalid month");
+    }
+
+    if (payload.year.toString().length !== 4) {
+      return toast.error("Invalid year");
     }
 
     try {
       setLoading(true);
-      await generateSalary(form);
+      await generateSalary(payload);
       toast.success("Salary generated successfully");
       fetchSalaries();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message || "Failed to generate salary");
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= ACTIONS ================= */
   const downloadSlip = async (id) => {
     const res = await downloadSalarySlip(id);
     const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -106,22 +134,31 @@ const Salary = () => {
     <>
       <Navbar />
       <Sidebar />
+
       <div className="main-content">
         <div className="mb-4">
-          <span className="dashboard-accent"></span>
-          <div>
-            <h4>Salary Management</h4>
-            <small className="text-muted">Add salary</small>
-          </div>
+          <h4>Salary Management</h4>
+          <small className="text-muted">Generate and manage salaries</small>
         </div>
+
+        {/* ================= GENERATE SALARY ================= */}
         <div className="card mb-4">
-          <div className="card-header fw-bold bg-dark text-light">Generate Salary</div>
+          <div className="card-header fw-bold bg-dark text-light">
+            Generate Salary
+          </div>
+
           <div className="card-body row g-3">
             <div className="col-md-3">
               <label>User</label>
               <select
                 className="form-select"
-                onChange={(e) => setForm({ ...form, userId: e.target.value })}
+                value={form.userId}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    userId: sanitizeInput(e.target.value),
+                  })
+                }
               >
                 <option value="">Select User</option>
                 {users.map((u) => (
@@ -136,8 +173,12 @@ const Salary = () => {
               <label>Department</label>
               <select
                 className="form-select"
+                value={form.departmentId}
                 onChange={(e) =>
-                  setForm({ ...form, departmentId: e.target.value })
+                  setForm({
+                    ...form,
+                    departmentId: sanitizeInput(e.target.value),
+                  })
                 }
               >
                 <option value="">Select Department</option>
@@ -153,9 +194,16 @@ const Salary = () => {
               <label>Month</label>
               <input
                 type="number"
+                min="1"
+                max="12"
                 className="form-control"
-                placeholder="MM"
-                onChange={(e) => setForm({ ...form, month: e.target.value })}
+                value={form.month}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    month: Number(sanitizeInput(e.target.value)),
+                  })
+                }
               />
             </div>
 
@@ -164,31 +212,38 @@ const Salary = () => {
               <input
                 type="number"
                 className="form-control"
-                placeholder="YYYY"
-                onChange={(e) => setForm({ ...form, year: e.target.value })}
+                value={form.year}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    year: Number(sanitizeInput(e.target.value)),
+                  })
+                }
               />
             </div>
 
-            {/* Earnings */}
             <div className="col-12 mt-3 fw-bold">Earnings</div>
             {Object.keys(form.earnings).map((k) => (
               <div className="col-md-2" key={k}>
                 <input
                   className="form-control"
                   placeholder={k}
-                  onChange={(e) => handleEarningChange(k, e.target.value)}
+                  onChange={(e) =>
+                    handleEarningChange(k, e.target.value)
+                  }
                 />
               </div>
             ))}
 
-            {/* Deductions */}
             <div className="col-12 mt-3 fw-bold">Deductions</div>
             {Object.keys(form.deductions).map((k) => (
               <div className="col-md-2" key={k}>
                 <input
                   className="form-control"
                   placeholder={k}
-                  onChange={(e) => handleDeductionChange(k, e.target.value)}
+                  onChange={(e) =>
+                    handleDeductionChange(k, e.target.value)
+                  }
                 />
               </div>
             ))}
@@ -199,7 +254,7 @@ const Salary = () => {
                 onClick={submitSalary}
                 disabled={loading}
               >
-                Generate Salary
+                {loading ? "Generating..." : "Generate Salary"}
               </button>
             </div>
           </div>
@@ -228,6 +283,7 @@ const Salary = () => {
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {salaries.slice(0, 5).map((s) => (
                 <tr key={s._id}>
@@ -236,19 +292,18 @@ const Salary = () => {
                   <td>{s.month}</td>
                   <td>{s.year}</td>
                   <td>₹ {s.netSalary}</td>
-                  <td className="d-flex">
+                  <td className="d-flex gap-1">
                     <button
-                      className="btn btn-sm btn-primary me-2"
-                      data-bs-toggle="tooltip"
-                      title="Download"
+                      className="btn btn-sm btn-primary"
+                      title="Download Slip"
                       onClick={() => downloadSlip(s._id)}
                     >
                       <FaFileDownload />
                     </button>
+
                     <button
                       className="btn btn-sm btn-success"
-                      data-bs-toggle="tooltip"
-                      title="Send Email"
+                      title="Email Slip"
                       onClick={() => emailSlip(s._id)}
                     >
                       <MdMarkEmailRead />
@@ -256,6 +311,14 @@ const Salary = () => {
                   </td>
                 </tr>
               ))}
+
+              {salaries.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center text-muted">
+                    No salary records found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

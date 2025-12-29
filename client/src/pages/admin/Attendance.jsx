@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { getTodayAttendance, markAttendance } from "../../services/api";
 import { FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { sanitizeInput } from "../../utils/sanitize";
 
 const statuses = ["Present", "Absent", "Leave", "Sick"];
 
 const Attendance = () => {
   const [list, setList] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState({});
+  const [loadingId, setLoadingId] = useState(null);
 
   useEffect(() => {
     fetchToday();
@@ -18,14 +20,18 @@ const Attendance = () => {
   const fetchToday = async () => {
     try {
       const res = await getTodayAttendance();
-      setList(res.attendance);
+      const attendance = res.attendance || [];
+
+      setList(attendance);
 
       const initial = {};
-      res.attendance.forEach((row) => {
+      attendance.forEach((row) => {
         if (!row.marked) {
-          initial[row.userId] = row.status; // default Absent
+          initial[sanitizeInput(row.userId)] =
+            sanitizeInput(row.status) || "Absent";
         }
       });
+
       setSelectedStatus(initial);
     } catch (err) {
       console.error(err.message);
@@ -35,20 +41,31 @@ const Attendance = () => {
   const handleCheckboxChange = (userId, status) => {
     setSelectedStatus((prev) => ({
       ...prev,
-      [userId]: status,
+      [sanitizeInput(userId)]: sanitizeInput(status),
     }));
   };
 
   const handleMark = async (userId, departmentId) => {
+    const sanitizedUserId = sanitizeInput(userId);
+    const sanitizedDeptId = sanitizeInput(departmentId);
+    const status = sanitizeInput(selectedStatus[sanitizedUserId]);
+
+    if (!status) return;
+
     try {
+      setLoadingId(sanitizedUserId);
+
       await markAttendance({
-        userId,
-        departmentId,
-        status: selectedStatus[userId],
+        userId: sanitizedUserId,
+        departmentId: sanitizedDeptId,
+        status,
       });
+
       await fetchToday();
     } catch (err) {
       console.error(err.message);
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -79,7 +96,7 @@ const Attendance = () => {
                 <th>User</th>
                 <th>Department</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th width="120">Action</th>
               </tr>
             </thead>
 
@@ -92,34 +109,37 @@ const Attendance = () => {
                 </tr>
               ) : (
                 list.map((row) => {
+                  const userId = sanitizeInput(row.userId);
                   const isMarked = row.marked === true;
+
+                  const currentStatus = isMarked
+                    ? sanitizeInput(row.status)
+                    : selectedStatus[userId];
 
                   return (
                     <tr
-                      key={row.userId}
+                      key={userId}
                       className={isMarked ? "table-success" : ""}
                     >
-                      <td>{row.name}</td>
-                      <td>{row.departmentName}</td>
+                      <td>{sanitizeInput(row.name)}</td>
+                      <td>{sanitizeInput(row.departmentName) || "-"}</td>
 
+                      {/* STATUS */}
                       <td>
-                        <div className="d-flex gap-3">
+                        <div className="d-flex flex-wrap gap-3">
                           {statuses.map((s) => (
                             <div
                               key={s}
                               className="form-check form-check-inline"
                             >
                               <input
-                                type="checkbox"
+                                type="radio"
+                                name={`status-${userId}`}
                                 className="form-check-input"
-                                checked={
-                                  (isMarked
-                                    ? row.status
-                                    : selectedStatus[row.userId]) === s
-                                }
+                                checked={currentStatus === s}
                                 disabled={isMarked}
                                 onChange={() =>
-                                  handleCheckboxChange(row.userId, s)
+                                  handleCheckboxChange(userId, s)
                                 }
                               />
                               <label className="form-check-label">
@@ -129,16 +149,19 @@ const Attendance = () => {
                           ))}
                         </div>
                       </td>
-
                       <td>
                         <button
-                          className="btn btn-sm btn-primary"
-                          disabled={isMarked}
+                          className="btn btn-sm btn-primary w-100"
+                          disabled={isMarked || loadingId === userId}
                           onClick={() =>
-                            handleMark(row.userId, row.departmentId)
+                            handleMark(userId, row.departmentId)
                           }
                         >
-                          {isMarked ? "Marked" : "Mark"}
+                          {isMarked
+                            ? "Marked"
+                            : loadingId === userId
+                            ? "Saving..."
+                            : "Mark"}
                         </button>
                       </td>
                     </tr>

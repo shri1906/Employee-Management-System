@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
+import { sanitizeInput } from "../../utils/sanitize";
 
 import {
   FaUser,
@@ -14,8 +15,6 @@ import {
   FaIdBadge,
   FaPhone,
   FaList,
-  FaCheck,
-  FaTimes,
 } from "react-icons/fa";
 
 import {
@@ -32,6 +31,7 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const fileInputRef = useRef();
+
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmText, setConfirmText] = useState("");
@@ -57,7 +57,7 @@ const Users = () => {
   const fetchPendingUsers = async () => {
     try {
       const res = await getPendingUsers();
-      setPendingUsers(res);
+      setPendingUsers(res || []);
     } catch (err) {
       toast.error(err.message);
     }
@@ -69,7 +69,14 @@ const Users = () => {
 
     try {
       const formData = new FormData();
-      Object.keys(form).forEach((key) => formData.append(key, form[key]));
+
+      formData.append("name", sanitizeInput(form.name));
+      formData.append("email", sanitizeInput(form.email));
+      formData.append("password", form.password); // ❌ never sanitize password
+      formData.append("role", form.role);
+      formData.append("department", sanitizeInput(form.department));
+      formData.append("designation", sanitizeInput(form.designation));
+      formData.append("phone", sanitizeInput(form.phone));
 
       if (profileImage) {
         formData.append("profileImage", profileImage);
@@ -98,10 +105,12 @@ const Users = () => {
   };
 
   const openApproveModal = (id) => {
+    const cleanId = sanitizeInput(id);
+
     setConfirmText("Approve this user and assign an employee ID?");
     setConfirmAction(() => async () => {
       try {
-        await approveUser(id);
+        await approveUser(cleanId);
         toast.success("User approved successfully");
         fetchPendingUsers();
       } catch (err) {
@@ -114,12 +123,14 @@ const Users = () => {
   };
 
   const openRejectModal = (id) => {
+    const cleanId = sanitizeInput(id);
+
     setConfirmText(
       "Reject this registration request? This action cannot be undone."
     );
     setConfirmAction(() => async () => {
       try {
-        await rejectUser(id);
+        await rejectUser(cleanId);
         toast.success("User rejected");
         fetchPendingUsers();
       } catch (err) {
@@ -156,6 +167,7 @@ const Users = () => {
           </div>
         </div>
 
+        {/* CREATE USER */}
         <div className="card shadow-sm mb-5">
           <div className="card-body">
             <h6 className="mb-3">Create User (Admin)</h6>
@@ -168,7 +180,9 @@ const Users = () => {
                   placeholder="Full name"
                   required
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, name: sanitizeInput(e.target.value) })
+                  }
                 />
               </div>
 
@@ -180,7 +194,9 @@ const Users = () => {
                   placeholder="Email"
                   required
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, email: sanitizeInput(e.target.value) })
+                  }
                 />
               </div>
 
@@ -203,7 +219,9 @@ const Users = () => {
                 <select
                   className="form-control px-4"
                   value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, role: e.target.value })
+                  }
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -216,13 +234,16 @@ const Users = () => {
                   className="form-control px-4"
                   value={form.department}
                   onChange={(e) =>
-                    setForm({ ...form, department: e.target.value })
+                    setForm({
+                      ...form,
+                      department: sanitizeInput(e.target.value),
+                    })
                   }
                 >
                   <option value="">Select department</option>
                   {departments.map((d) => (
                     <option key={d._id} value={d._id}>
-                      {d.name}
+                      {sanitizeInput(d.name)}
                     </option>
                   ))}
                 </select>
@@ -237,7 +258,7 @@ const Users = () => {
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      designation: e.target.value,
+                      designation: sanitizeInput(e.target.value),
                     })
                   }
                 />
@@ -249,7 +270,12 @@ const Users = () => {
                   className="form-control"
                   placeholder="Phone"
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      phone: sanitizeInput(e.target.value),
+                    })
+                  }
                 />
               </div>
 
@@ -275,6 +301,7 @@ const Users = () => {
           </div>
         </div>
 
+        {/* PENDING USERS */}
         {pendingUsers.length > 0 && (
           <div className="card shadow-sm">
             <div className="card-body">
@@ -299,9 +326,7 @@ const Users = () => {
                           <img
                             src={
                               u.profileImage
-                                ? `${import.meta.env.VITE_LOCALHOST}${
-                                    u.profileImage
-                                  }`
+                                ? `${import.meta.env.VITE_LOCALHOST}${u.profileImage}`
                                 : "https://via.placeholder.com/40"
                             }
                             alt="profile"
@@ -310,10 +335,14 @@ const Users = () => {
                             className="rounded-circle"
                           />
                         </td>
-                        <td>{u.name}</td>
-                        <td>{u.email}</td>
-                        <td>{u.department?.name || "—"}</td>
-                        <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                        <td>{sanitizeInput(u.name)}</td>
+                        <td>{sanitizeInput(u.email)}</td>
+                        <td>
+                          {sanitizeInput(u.department?.name) || "—"}
+                        </td>
+                        <td>
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
                         <td>
                           <button
                             className="btn btn-success btn-sm me-2"
@@ -321,7 +350,6 @@ const Users = () => {
                           >
                             Approve
                           </button>
-
                           <button
                             className="btn btn-danger btn-sm"
                             onClick={() => openRejectModal(u._id)}
@@ -338,6 +366,7 @@ const Users = () => {
           </div>
         )}
       </div>
+
       <ConfirmModal
         show={showConfirm}
         title="Confirmation required"

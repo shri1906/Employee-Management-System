@@ -11,7 +11,7 @@ import {
   updateDepartment,
   deleteDepartment,
 } from "../../services/api";
-
+import { sanitizeInput } from "../../utils/sanitize";
 const ITEMS_PER_PAGE = 5;
 
 const Departments = () => {
@@ -43,12 +43,21 @@ const Departments = () => {
     e.preventDefault();
     setLoading(true);
 
+    const cleanName = sanitizeInput(name);
+    const cleanCode = sanitizeInput(code).toUpperCase();
+
+    if (!cleanName || !cleanCode) {
+      toast.error("Invalid department details");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (editingId) {
-        await updateDepartment(editingId, name, code);
+        await updateDepartment(editingId, cleanName, cleanCode);
         toast.success("Department updated successfully");
       } else {
-        await createDepartment(name, code);
+        await createDepartment(cleanName, cleanCode);
         toast.success("Department created successfully");
       }
 
@@ -64,8 +73,8 @@ const Departments = () => {
   };
 
   const edit = (dept) => {
-    setName(dept.name);
-    setCode(dept.code);
+    setName(sanitizeInput(dept.name));
+    setCode(sanitizeInput(dept.code));
     setEditingId(dept._id);
   };
 
