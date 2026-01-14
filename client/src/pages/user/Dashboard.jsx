@@ -24,6 +24,33 @@ const UserDashboard = () => {
 
   const { attendanceSummary, workingDays, leaveTaken, latestSalary } = data;
 
+  const cardConfig = [
+    {
+      title: "Working Days",
+      value: workingDays,
+      icon: <FaBriefcase size={32}  />,
+      gradient: "card-gradient-1",
+    },
+    {
+      title: "Present Days",
+      value: attendanceSummary.Present,
+      icon: <FaCalendarCheck size={32} />,
+      gradient: "card-gradient-2",
+    },
+    {
+      title: "Leaves Taken",
+      value: leaveTaken,
+      icon: <FaUserClock size={32} />,
+      gradient: "card-gradient-3",
+    },
+    {
+      title: "Last Salary",
+      value: latestSalary ? `₹ ${latestSalary.netSalary}` : "N/A",
+      icon: <FaMoneyBillWave size={32} />,
+      gradient: "card-gradient-4",
+    },
+  ];
+
   return (
     <>
       <Navbar />
@@ -35,26 +62,19 @@ const UserDashboard = () => {
 
         {/* SUMMARY CARDS */}
         <div className="row g-4 mt-3">
-          <DashboardCard
-            title="Working Days"
-            value={workingDays}
-            icon={<FaBriefcase className="text-success" />}
-          />
-          <DashboardCard
-            title="Present Days"
-            value={attendanceSummary.Present}
-            icon={<FaCalendarCheck className="text-primary" />}
-          />
-          <DashboardCard
-            title="Leaves Taken"
-            value={leaveTaken}
-            icon={<FaUserClock className="text-warning" />}
-          />
-          <DashboardCard
-            title="Last Salary"
-            value={latestSalary ? `₹ ${latestSalary.netSalary}` : "N/A"}
-            icon={<FaMoneyBillWave className="text-danger" />}
-          />
+          {cardConfig.map((c, i) => (
+            <div className="col-md-3" key={i}>
+              <Link to={c.link} className="text-decoration-none">
+                <div className={`cards dashboard-card shadow ${c.gradient}`}>
+                  <div className="card-body text-center">
+                    <div className="mb-2">{c.icon}</div>
+                    <h6 className="fw-semibold">{c.title}</h6>
+                    <h2 className="fw-bold">{c.value}</h2>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
         </div>
 
         {/* ATTENDANCE SUMMARY */}
@@ -121,17 +141,5 @@ const UserDashboard = () => {
     </>
   );
 };
-
-const DashboardCard = ({ title, value, icon }) => (
-  <div className="col-md-3">
-    <div className="card shadow-sm border-0 text-center">
-      <div className="card-body">
-        <div className="mb-2 fs-3 text-primary">{icon}</div>
-        <h6>{title}</h6>
-        <h3>{value}</h3>
-      </div>
-    </div>
-  </div>
-);
 
 export default UserDashboard;
