@@ -23,7 +23,7 @@ import MyLeaves from "./pages/user/MyLeaves";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Userlist  from "./pages/admin/Userlist";
 import MonthlyAttendanceAdmin from "./pages/admin/MonthlyAttendanceAdmin";
-import MonthlyAttendanceUser from "./pages/user/MonthlyAttendanceUSer";
+import MonthlyAttendanceUser from "./pages/user/MonthlyAttendanceUser";
 import SalaryHistory from "./pages/admin/SalaryHistory";
 import ChangePassword from "./pages/auth/ChangePassword";
 import Register from "./pages/auth/Register";
