@@ -3,7 +3,7 @@ import { applyLeave, myLeaves } from "../../services/api";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { toast } from "react-toastify";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const MyLeaves = () => {
   const [leaves, setLeaves] = useState([]);

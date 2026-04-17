@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { toast } from "react-toastify";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const Leaves = () => {
   const [leaves, setLeaves] = useState([]);

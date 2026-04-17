@@ -13,7 +13,7 @@ import {
 import { toast } from "react-toastify";
 import { FaFileDownload } from "react-icons/fa";
 import { MdMarkEmailRead } from "react-icons/md";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const Salary = () => {
   const navigate = useNavigate();

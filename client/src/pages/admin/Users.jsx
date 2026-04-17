@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 import {
   FaUser,

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getTodayAttendance, markAttendance } from "../../services/api";
 import { FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 
 const statuses = ["Present", "Absent", "Leave", "Sick"];
 
