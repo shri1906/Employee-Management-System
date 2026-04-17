@@ -11,7 +11,7 @@ import {
   updateDepartment,
   deleteDepartment,
 } from "../../services/api";
-import { sanitizeInput } from "../../utils/sanitize";
+import { sanitizeInput } from "../../utils/Sanitize";
 const ITEMS_PER_PAGE = 5;
 
 const Departments = () => {
