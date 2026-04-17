@@ -183,6 +183,7 @@ const Register = () => {
                 {loading ? "Submitting..." : "Apply for registration"}
               </button>
             </form>
+            <a href="/login" className="d-block text-center mt-3 text-decoration-none">Back to login</a>
           </div>
         </div>
       </div>

@@ -4,20 +4,49 @@ import { Link } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { sanitizeInput } from "../../utils/Sanitize";
+import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const submit = async (e) => {
     e.preventDefault();
+
     const sanitizedEmail = sanitizeInput(email).toLowerCase();
-    await api.post("/auth/forgot-password", { sanitizedEmail});
-    toast.success("Reset link sent to your email");
+
+    if (!sanitizedEmail) {
+      return toast.error("Email is required");
+    }
+
+    try {
+      setLoading(true);
+
+      await api.post("/auth/forgot-password", {
+        email: sanitizedEmail, // ✅ FIXED
+      });
+
+      toast.success("Reset link sent to your email");
+      setEmail("");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+
+      toast.error(
+        err.response?.data?.message ||
+        err.message ||
+        "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
+        {/* LEFT */}
         <div className="col-md-6 d-none d-md-flex align-items-center justify-content-center login-left">
           <div className="text-white text-center px-4">
             <h1 className="fw-bold">Forgot Password?</h1>
@@ -27,6 +56,7 @@ export default function ForgotPassword() {
           </div>
         </div>
 
+        {/* RIGHT */}
         <div className="col-md-6 d-flex align-items-center justify-content-center">
           <div
             className="card shadow-lg p-4"
@@ -42,12 +72,18 @@ export default function ForgotPassword() {
                   className="form-control"
                   placeholder="Email"
                   required
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(sanitizeInput(e.target.value))
+                  }
                 />
               </div>
 
-              <button className="btn login-left text-white w-100 mb-3">
-                Send Reset Link
+              <button
+                className="btn login-left text-white w-100 mb-3"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send Reset Link"}
               </button>
 
               <div className="text-center">
